@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // ─────────────────────────────────────────────────────────────
 // 理财 · 人赚不到认知以外的钱
@@ -10,9 +11,33 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // ─────────────────────────────────────────────────────────────
 
 const BOOKS = [
-  { title: '《金钱心理学》',              mark: 'MONEY',  tone: 'amber' },
-  { title: '《拿工薪，三十几岁你也能赚到600万》', mark: 'SALARY', tone: 'green' },
-  { title: '《聪明的投资者》',            mark: 'VALUE',  tone: 'blue'  },
+  {
+    title: '《金钱心理学》',
+    mark: 'MONEY',
+    tone: 'amber',
+    slug: 'money-psychology',
+    coverTitle: '金钱心理学',
+    coverSubtitle: 'The Psychology of Money',
+    coverAuthor: '摩根·豪泽尔',
+  },
+  {
+    title: '《拿工薪，三十几岁你也能赚到600万》',
+    mark: 'SALARY',
+    tone: 'green',
+    slug: 'salary-millions',
+    coverTitle: '拿工薪',
+    coverSubtitle: '三十几岁你也能赚到600万',
+    coverAuthor: '安德鲁·哈勒姆',
+  },
+  {
+    title: '《聪明的投资者》',
+    mark: 'VALUE',
+    tone: 'blue',
+    slug: 'intelligent-investor',
+    coverTitle: '聪明的投资者',
+    coverSubtitle: 'The Intelligent Investor',
+    coverAuthor: '本杰明·格雷厄姆',
+  },
 ]
 
 const STEPS = [
@@ -33,6 +58,24 @@ const STEPS = [
   },
 ]
 
+const FINANCE_BASICS = [
+  {
+    mark: 'HOUSE',
+    title: '到底该不该买房？',
+    body: '先把它拆成居住需求和投资决策。自住要看城市稳定性、通勤、家庭计划和月供压力；投资要比较租售比、贷款利率、持有成本、流动性和机会成本。',
+  },
+  {
+    mark: 'CAR',
+    title: '到底该不该买车？',
+    body: '车多数时候是消费品，不是资产。买之前先算购置税、保险、停车、保养、折旧和使用频率；如果它明显提升通勤效率或收入能力，才可能值得提前买。',
+  },
+  {
+    mark: 'ROI',
+    title: '投资回报率如何权衡？',
+    body: '不要只看预期收益率，要同时看风险、时间、流动性和你的可承受亏损。教育、健康、技能和人脉的回报不一定立刻变现，但可能改变长期收入上限。',
+  },
+]
+
 const PAGES    = 2
 const ANIM_MS  = 800
 const LOCK_MS  = ANIM_MS + 220
@@ -42,6 +85,7 @@ const GESTURE_GAP_MS  = 220
 export default function FinancePage() {
   const [page, setPage]             = useState(0)
   const [contentKey, setContentKey] = useState(0)
+  const navigate                    = useNavigate()
   const containerRef                = useRef(null)
   const contentScrollRef            = useRef(null)   // inner scroll on page 2
   const lockRef                     = useRef(false)
@@ -205,8 +249,8 @@ export default function FinancePage() {
             </section>
 
             <section className="finance-step finance-step-featured">
-              <div className="finance-step-index">01</div>
               <div className="finance-step-copy">
+                <div className="finance-step-index">01</div>
                 <h2>财务自由的第一步：提高认知</h2>
                 <p>
                   先提高认知，再谈机会。认知决定你看得懂什么、拿得住什么，也决定你能避开什么。
@@ -214,32 +258,104 @@ export default function FinancePage() {
               </div>
               <div className="finance-books" aria-label="推荐书单">
                 {BOOKS.map((book, index) => (
-                  <article className="finance-book" key={book.title}>
+                  <article
+                    key={book.title}
+                    className="finance-book finance-book-link"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`进入 ${book.title} 书摘页`}
+                    onClick={() => navigate(`/books/${book.slug}`)}
+                    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate(`/books/${book.slug}`)}
+                  >
                     <div
                       className={`finance-book-cover finance-book-cover-${book.tone}`}
                       role="img"
                       aria-label={`${book.title} 书籍封面`}
                     >
-                      <span>{book.mark}</span>
-                      <em>{String(index + 1).padStart(2, '0')}</em>
+                      <div className="finance-book-cover-head">
+                        <span>{book.mark}</span>
+                        <em>{String(index + 1).padStart(2, '0')}</em>
+                      </div>
+                      <div className="finance-book-cover-body">
+                        <strong>{book.coverTitle}</strong>
+                        <p>{book.coverSubtitle}</p>
+                      </div>
+                      <div className="finance-book-cover-foot">
+                        <span>{book.coverAuthor}</span>
+                      </div>
                     </div>
-                    <strong>{book.title}</strong>
+                    <div className="finance-book-link-hint" aria-hidden="true">读书摘 →</div>
                   </article>
                 ))}
               </div>
             </section>
 
             <div className="finance-step-grid">
-              {STEPS.slice(1).map(step => (
-                <section className="finance-step" key={step.number}>
-                  <div className="finance-step-index">{step.number}</div>
-                  <div className="finance-step-copy">
-                    <h2>{step.title}</h2>
-                    <p>{step.body}</p>
-                  </div>
-                </section>
-              ))}
+              {/* 第二步：点击进入股市讲解页 */}
+              <section
+                className="finance-step finance-step-link finance-step-link-gold"
+                role="button"
+                tabIndex={0}
+                aria-label="进入股市长期持有讲解页"
+                onClick={() => navigate('/finance/stocks')}
+                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/finance/stocks')}
+              >
+                <div className="finance-step-index">{STEPS[1].number}</div>
+                <div className="finance-step-copy">
+                  <h2>{STEPS[1].title}</h2>
+                  <p>{STEPS[1].body}</p>
+                </div>
+                <div className="finance-step-link-arrow" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </div>
+              </section>
+
+              {/* 第三步：点击跳转到健康页 */}
+              <section
+                className="finance-step finance-step-link"
+                role="button"
+                tabIndex={0}
+                aria-label="进入保持身体健康详情页"
+                onClick={() => navigate('/health')}
+                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/health')}
+              >
+                <div className="finance-step-index">{STEPS[2].number}</div>
+                <div className="finance-step-copy">
+                  <h2>{STEPS[2].title}</h2>
+                  <p>{STEPS[2].body}</p>
+                </div>
+                <div className="finance-step-link-arrow" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </div>
+              </section>
             </div>
+
+            <section className="finance-basics" aria-label="金融常识">
+              <div className="finance-basics-header">
+                <span>FINANCE BASICS</span>
+                <h2>金融常识：先算清代价，再谈拥有</h2>
+                <p>
+                  房、车和投资不是单纯的“该不该”，而是现金流、风险和机会成本的权衡。做决定前，先把隐性成本写出来。
+                </p>
+              </div>
+              <div className="finance-basic-grid">
+                {FINANCE_BASICS.map(item => (
+                  <article className="finance-basic-card" key={item.title}>
+                    <div className="finance-basic-mark">{item.mark}</div>
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
           </main>
         </div>
       </div>

@@ -176,6 +176,9 @@ export default function SearchPalette({ open, onClose }) {
 
   if (!open) return null
 
+  // 手机端 (≤640px) 全屏 modal 而非居中卡片，更好利用屏幕
+  const isPhoneVw = typeof window !== 'undefined' && window.innerWidth <= 640
+
   return (
     <div
       onClick={onClose}
@@ -189,7 +192,7 @@ export default function SearchPalette({ open, onClose }) {
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        paddingTop: '12vh',
+        paddingTop: isPhoneVw ? 'env(safe-area-inset-top, 0px)' : '12vh',
         animation: 'fadeIn 0.15s ease-out',
       }}
     >
@@ -199,12 +202,17 @@ export default function SearchPalette({ open, onClose }) {
         aria-modal="true"
         aria-label="搜索算法和指南"
         style={{
-          width: '92%', maxWidth: 560,
+          width: isPhoneVw ? '100%' : '92%',
+          maxWidth: isPhoneVw ? '100%' : 560,
+          height: isPhoneVw ? '100%' : undefined,
+          maxHeight: isPhoneVw ? '100%' : undefined,
           background: 'var(--bg-elev)',
           border: '1px solid var(--border-strong)',
-          borderRadius: 12,
+          borderRadius: isPhoneVw ? 0 : 12,
           boxShadow: 'var(--shadow-lg)',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
           animation: 'paletteIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
@@ -250,7 +258,14 @@ export default function SearchPalette({ open, onClose }) {
           id="search-palette-list"
           role="listbox"
           aria-label="搜索结果"
-          style={{ maxHeight: '52vh', overflowY: 'auto', padding: 8 }}
+          style={{
+            maxHeight: isPhoneVw ? 'none' : '52vh',
+            flex: isPhoneVw ? '1 1 auto' : undefined,
+            minHeight: 0,
+            overflowY: 'auto',
+            padding: 8,
+            WebkitOverflowScrolling: 'touch',
+          }}
         >
           {results.length === 0 && (
             <div role="status" aria-live="polite" style={{

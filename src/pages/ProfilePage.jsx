@@ -43,7 +43,12 @@ export default function ProfilePage() {
   const recentAlgo = recentSlug ? ALGORITHMS[recentSlug] : null
 
   return (
-    <div style={{ maxWidth: 1080, margin: '0 auto', padding: '40px 32px 120px' }}>
+    <div style={{
+      maxWidth: 1080,
+      margin: '0 auto',
+      // 手机端水平 padding 16，垂直降到 24；底部 120 已为 bottom nav 留足
+      padding: 'clamp(24px, 4vw, 40px) clamp(16px, 3vw, 32px) clamp(80px, 16vw, 120px)',
+    }}>
       <Hero displayName={displayName} avatar={avatar} streak={streak} pct={pct} done={completed.size} total={total} loggedIn={!!user} authEnabled={enabled} />
 
       <Section title="本周周报">

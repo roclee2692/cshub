@@ -7,6 +7,8 @@ const PAGE_TINTS = [
   { test: p => p.startsWith('/learn') || p.startsWith('/path'), tint: '#2f6fed' },
   { test: p => p.startsWith('/profile'), tint: '#22c55e' },
   { test: p => p.startsWith('/finance'), tint: '#10b981' },
+  { test: p => p.startsWith('/books'),   tint: '#d7b56d' },
+  { test: p => p.startsWith('/health'),  tint: '#4ade80' },
   { test: p => p.startsWith('/growth'), tint: '#f97316' },
   { test: p => p.startsWith('/logic'), tint: '#0ea5e9' },
   { test: p => p.startsWith('/roadmap'), tint: '#10b981' },
@@ -90,7 +92,7 @@ function pickIslandTheme(pathname, tintRgb) {
     }
   }
 
-  if (pathname.startsWith('/finance')) {
+  if (pathname.startsWith('/finance') || pathname.startsWith('/books')) {
     return {
       vars: {
         '--text-primary': '#f7efd8',

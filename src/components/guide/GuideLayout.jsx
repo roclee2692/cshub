@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 
 /**
  * 通用章节式教程布局 - 全新重排版
@@ -187,7 +187,7 @@ export default function GuideLayout({ meta, sections }) {
       <main ref={contentRef} style={{ flex: 1, overflowY: 'auto', minHeight: 0, height: '100%' }}>
 
         {/* Page hero — same transparent background as the rest */}
-        <div className="guide-hero" style={{ padding: '56px 56px 32px', position: 'relative', overflow: 'hidden' }}>
+        <div className="guide-hero" style={{ padding: '112px 56px 36px', position: 'relative', overflow: 'hidden' }}>
           {/* Soft ambient glow orbs */}
           <div style={{
             position: 'absolute', top: -60, right: -60,
@@ -204,7 +204,14 @@ export default function GuideLayout({ meta, sections }) {
 
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             {/* Tag pill */}
-            <div style={{ marginBottom: 16 }}>
+            <div className="guide-hero-kicker-row">
+              <Link to="/learn" className="guide-hero-back">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                返回资源导航
+              </Link>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
@@ -224,8 +231,8 @@ export default function GuideLayout({ meta, sections }) {
               </span>
             </div>
 
-            {/* Title */}
-            <h1 style={{
+            {/* Title — className 让 @media 768 的 32px 规则生效 */}
+            <h1 className="guide-hero-title" style={{
               fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
               color: 'var(--text-primary)', margin: '0 0 16px',
               lineHeight: 1.1, textAlign: 'center',
@@ -234,7 +241,7 @@ export default function GuideLayout({ meta, sections }) {
             </h1>
 
             {/* Subtitle */}
-            <p style={{
+            <p className="guide-hero-subtitle" style={{
               fontSize: 17, color: 'var(--text-secondary)',
               lineHeight: 1.7, margin: '0 0 28px',
               maxWidth: 640, fontWeight: 400, textAlign: 'center',

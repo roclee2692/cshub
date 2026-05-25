@@ -60,13 +60,16 @@ export default function AlgorithmTabs({ algo }) {
 
   return (
     <section className="mt-6">
-      {/* Tab bar */}
+      {/* Tab bar
+          手机端：top-2（避开 TopBar 72px 高度需要的偏移由 page-container padding-top 提供）+ 紧凑 padding
+          桌面/iPad：top-14 + 圆角卡片包裹 */}
       <div role="tablist" aria-label="算法详情"
-        className="sticky top-14 z-10 -mx-4 mb-4 flex flex-wrap items-center gap-1 overflow-x-auto px-4 py-2
+        className="sticky top-2 sm:top-14 z-10 -mx-4 mb-4 flex flex-nowrap items-center gap-1 overflow-x-auto px-3 py-2
                    border-b border-[var(--glass-border)]
                    bg-[var(--header-bg)]
                    backdrop-blur-xl
-                   sm:mx-0 sm:rounded-xl sm:border sm:border-[var(--glass-border-strong)] sm:bg-[var(--glass-bg-mid)] sm:px-2 sm:py-1.5"
+                   sm:flex-wrap sm:mx-0 sm:rounded-xl sm:border sm:border-[var(--glass-border-strong)] sm:bg-[var(--glass-bg-mid)] sm:px-2 sm:py-1.5"
+        style={{ scrollbarWidth: 'thin' }}
       >
         {TAB_DEFS.map(t => {
           if (t.id === 'quiz' && !hasQuiz) return null
@@ -79,7 +82,9 @@ export default function AlgorithmTabs({ algo }) {
               id={`tab-${t.id}`}
               onClick={() => select(t.id)}
               className={[
-                'group inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all duration-150 outline-none',
+                // 手机更紧凑 (px-2 py-1.5 text-xs)，桌面/iPad 恢复 (sm:px-3 sm:py-1.5 sm:text-sm)
+                'group inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12.5px] font-semibold transition-all duration-150 outline-none whitespace-nowrap flex-shrink-0',
+                'sm:px-3 sm:text-sm',
                 isActive
                   ? 'bg-[var(--accent-soft)] text-[var(--accent-light)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
                   : 'text-[var(--text-secondary)] hover:bg-[var(--glass-bg-strong)] hover:text-[var(--text-primary)]',

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GUITAR_CURRICULUM, GUITAR_LESSON_MAP, GUITAR_TOTAL_LESSONS } from '../data/guitar/curriculum'
 import { GUITAR_CHORDS } from '../data/guitar/chords'
@@ -47,6 +48,7 @@ function GuitarExercise({ exercise }) {
 
 export default function GuitarLessonPage() {
   const { lessonId } = useParams()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const lesson = GUITAR_LESSON_MAP[lessonId]
   const { isCompleted, markComplete, progress } = useCourseProgress(
     GUITAR_CURRICULUM.id,
@@ -62,9 +64,22 @@ export default function GuitarLessonPage() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="music-lesson-shell">
+      <button
+        type="button"
+        className="music-lesson-sidebar-toggle"
+        data-collapsed={sidebarCollapsed ? 'true' : 'false'}
+        aria-label={sidebarCollapsed ? '展开课程目录' : '收起课程目录'}
+        title={sidebarCollapsed ? '展开课程目录' : '收起课程目录'}
+        onClick={() => setSidebarCollapsed(v => !v)}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
       {/* Sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 flex-shrink-0 border-r border-border-soft px-3 py-6 overflow-y-auto">
+      <div className="music-lesson-sidebar-frame" data-collapsed={sidebarCollapsed ? 'true' : 'false'}>
+      <aside className="flex h-full flex-col w-60 flex-shrink-0 border-r border-border-soft px-3 py-6 overflow-y-auto">
         <Link
           to="/guitar"
           className="flex items-center gap-2 text-fg-muted hover:text-fg text-sm mb-5 transition-colors"
@@ -92,6 +107,7 @@ export default function GuitarLessonPage() {
           currentLessonId={lessonId}
         />
       </aside>
+      </div>
 
       {/* Main */}
       <main className="flex-1 px-6 py-8 overflow-y-auto">

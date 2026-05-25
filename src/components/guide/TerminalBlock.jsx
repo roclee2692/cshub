@@ -63,10 +63,16 @@ export default function TerminalBlock({ commands, title = 'Terminal', showTitle 
         </div>
       )}
 
-      {/* Commands */}
-      <div style={{ padding: '16px', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+      {/* Commands · 容器横向滚动，长命令在窄屏不破版 */}
+      <div style={{
+        padding: '16px',
+        fontFamily: 'var(--font-mono)',
+        fontSize: 13,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}>
         {commands.map((item, i) => (
-          <div key={i} style={{ marginBottom: i < commands.length - 1 ? 12 : 0 }}>
+          <div key={i} style={{ marginBottom: i < commands.length - 1 ? 12 : 0, minWidth: 0 }}>
             {/* Comment */}
             {item.comment && (
               <div style={{ color: '#6e7681', fontSize: 12, marginBottom: 4 }}>
@@ -76,7 +82,7 @@ export default function TerminalBlock({ commands, title = 'Terminal', showTitle 
             {/* Command line */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
               <span style={{ color: '#7c3aed', flexShrink: 0, userSelect: 'none', marginTop: 1 }}>$</span>
-              <span style={{ color: '#e6edf3', lineHeight: 1.6 }}>
+              <span style={{ color: '#e6edf3', lineHeight: 1.6, whiteSpace: 'pre' }}>
                 {highlightGit(item.cmd)}
               </span>
             </div>

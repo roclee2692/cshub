@@ -18,17 +18,17 @@ export default function PracticeToolbar({
   const playLabel = starting && !samplesLoaded ? '加载中…' : isPlaying ? '暂停' : '播放'
 
   return (
-    <div className="flex flex-col gap-3 rounded-3xl border-2 border-[#f5d9b8] bg-white/85 px-5 py-4 shadow-[0_6px_20px_rgba(232,140,140,0.12)]">
+    <div className="piano-practice-toolbar flex flex-col gap-3 rounded-3xl border-2 border-[#f5d9b8] bg-white/85 px-5 py-4 shadow-[0_6px_20px_rgba(232,140,140,0.12)]">
       <div className="flex flex-wrap items-center gap-3">
         <Link
           to="/piano"
-          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-[#9e7f7f] hover:bg-[#fff0e6]"
+          className="piano-toolbar-link flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-[#9e7f7f] hover:bg-[#fff0e6]"
         >
           ← 曲库
         </Link>
         <div className="flex-1">
-          <h2 className="text-2xl font-black text-[#3d2a2a] leading-tight">{song.title}</h2>
-          <p className="text-xs font-semibold text-[#9e7f7f]">
+          <h2 className="piano-toolbar-title text-2xl font-black text-[#3d2a2a] leading-tight">{song.title}</h2>
+          <p className="piano-toolbar-meta text-xs font-semibold text-[#9e7f7f]">
             {song.composer ?? '—'} · BPM {bpm} · {'⭐'.repeat(song.difficulty ?? 1)}
           </p>
         </div>
@@ -41,22 +41,22 @@ export default function PracticeToolbar({
         </button>
         <button
           onClick={onReplay}
-          className="rounded-full border-2 border-[#e8a4a4] bg-white px-4 py-2 text-sm font-bold text-[#e86c5d] hover:bg-[#fff0e6]"
+          className="piano-toolbar-secondary rounded-full border-2 border-[#e8a4a4] bg-white px-4 py-2 text-sm font-bold text-[#e86c5d] hover:bg-[#fff0e6]"
         >
           重播
         </button>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <div className="flex items-center gap-1 rounded-full bg-[#fdebd3] p-1" role="group" aria-label="模式">
+        <div className="piano-mode-group flex items-center gap-1 rounded-full bg-[#fdebd3] p-1" role="group" aria-label="模式">
           {Object.entries(MODES).map(([value, label]) => (
             <button
               key={value}
               onClick={() => onModeChange(value)}
               className={
                 mode === value
-                  ? 'rounded-full bg-white px-3 py-1 font-bold text-[#e86c5d] shadow-sm'
-                  : 'rounded-full px-3 py-1 font-semibold text-[#9e7f7f] hover:bg-white/60'
+                  ? 'piano-mode-active rounded-full bg-white px-3 py-1 font-bold text-[#e86c5d] shadow-sm'
+                  : 'piano-mode-idle rounded-full px-3 py-1 font-semibold text-[#9e7f7f] hover:bg-white/60'
               }
             >
               {label}
@@ -64,7 +64,7 @@ export default function PracticeToolbar({
           ))}
         </div>
 
-        <label className="flex items-center gap-2 text-[#9e7f7f] font-semibold">
+        <label className="piano-control-label flex items-center gap-2 text-[#9e7f7f] font-semibold">
           <span>BPM {bpm}</span>
           <input
             type="range"
@@ -76,7 +76,7 @@ export default function PracticeToolbar({
           />
         </label>
 
-        <label className="flex items-center gap-2 text-[#9e7f7f] font-semibold">
+        <label className="piano-control-label flex items-center gap-2 text-[#9e7f7f] font-semibold">
           <span>音量 {Math.round(volume * 100)}</span>
           <input
             type="range"
@@ -93,8 +93,8 @@ export default function PracticeToolbar({
           onClick={onSustainToggle}
           className={
             sustain
-              ? 'rounded-full bg-[#f6d057] px-3 py-1 text-sm font-bold text-[#7a5a1a]'
-              : 'rounded-full border border-[#e8a4a4] bg-white px-3 py-1 text-sm font-semibold text-[#9e7f7f]'
+              ? 'piano-sustain-active rounded-full bg-[#f6d057] px-3 py-1 text-sm font-bold text-[#7a5a1a]'
+              : 'piano-sustain-idle rounded-full border border-[#e8a4a4] bg-white px-3 py-1 text-sm font-semibold text-[#9e7f7f]'
           }
         >
           延音 {sustain ? '开' : '关'}

@@ -83,9 +83,9 @@ export const SUBJECTS = {
     icon: '🛠️',
     color: '#f59e0b',
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
-    description: '正则 → NFA/DFA、递归下降与 AST 构建',
+    description: '正则 → NFA/DFA、递归下降 AST、LL/LR 分析与代码生成',
     available: true,
-    categories: ['compilerLex', 'compilerSyn'],
+    categories: ['compilerLex', 'compilerSyn', 'compilerCode'],
   },
 }
 

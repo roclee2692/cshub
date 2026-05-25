@@ -1,30 +1,38 @@
+import { useIsPhone } from '../../hooks/useMediaQuery'
+
 export function Toolbar({ children }) {
+  const isPhone = useIsPhone()
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      marginBottom: 12,
-      flexWrap: 'wrap',
-      padding: '8px 10px',
-      background: 'var(--glass-bg)',
-      backdropFilter: 'var(--glass-blur)',
-      WebkitBackdropFilter: 'var(--glass-blur)',
-      border: '1px solid var(--glass-border)',
-      boxShadow: 'var(--glass-shine)',
-      borderRadius: 'var(--r-md)',
-    }}>
+    <div
+      className="playground-toolbar"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: isPhone ? 4 : 6,
+        marginBottom: 12,
+        flexWrap: 'wrap',
+        padding: isPhone ? '6px 8px' : '8px 10px',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: 'var(--glass-shine)',
+        borderRadius: 'var(--r-md)',
+      }}>
       {children}
     </div>
   )
 }
 
 export function ToolbarBtn({ children, onClick, active }) {
+  const isPhone = useIsPhone()
   return (
     <button
       onClick={onClick}
       style={{
-        padding: '5px 13px',
+        // 手机端拉高至 36 满足触摸目标 (>=32)，桌面保持 28
+        minHeight: isPhone ? 36 : undefined,
+        padding: isPhone ? '7px 14px' : '5px 13px',
         borderRadius: 'var(--r-sm)',
         fontSize: 12.5,
         fontWeight: 600,
@@ -36,6 +44,7 @@ export function ToolbarBtn({ children, onClick, active }) {
         color: active ? 'var(--accent-light)' : 'var(--text-secondary)',
         transition: 'all 0.15s',
         letterSpacing: '-0.01em',
+        WebkitTapHighlightColor: 'transparent',
       }}
       onMouseEnter={e => {
         if (!active) {
@@ -56,16 +65,26 @@ export function ToolbarBtn({ children, onClick, active }) {
 }
 
 export function TextInput({ value, onChange, placeholder, onSubmit, submitLabel = '应用', width = 220 }) {
+  const isPhone = useIsPhone()
   return (
-    <div style={{ display: 'flex', gap: 6 }}>
+    <div style={{
+      display: 'flex',
+      gap: 6,
+      // 手机端整组占满工具栏剩余宽度，避免 220px 固定宽度溢出
+      flex: isPhone ? '1 1 100%' : '0 1 auto',
+      minWidth: 0,
+    }}>
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         onKeyDown={e => { if (e.key === 'Enter') onSubmit() }}
         style={{
-          width,
-          padding: '5px 10px',
+          // 桌面保持原 width；手机端用 flex 撑满，但永远不超过容器
+          width: isPhone ? '100%' : width,
+          flex: isPhone ? 1 : undefined,
+          minWidth: 0,
+          padding: isPhone ? '7px 11px' : '5px 10px',
           borderRadius: 'var(--r-sm)',
           border: '1px solid var(--glass-border)',
           background: 'var(--glass-bg-mid)',
@@ -79,7 +98,8 @@ export function TextInput({ value, onChange, placeholder, onSubmit, submitLabel 
       <button
         onClick={onSubmit}
         style={{
-          padding: '5px 13px',
+          minHeight: isPhone ? 36 : undefined,
+          padding: isPhone ? '7px 14px' : '5px 13px',
           borderRadius: 'var(--r-sm)',
           fontSize: 12.5, fontWeight: 600,
           background: 'var(--accent-soft)',
@@ -87,6 +107,9 @@ export function TextInput({ value, onChange, placeholder, onSubmit, submitLabel 
           boxShadow: '0 0 12px var(--accent-soft)',
           color: 'var(--accent-light)',
           transition: 'all 0.15s',
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
+          WebkitTapHighlightColor: 'transparent',
         }}
         onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-dim)'; e.currentTarget.style.color = 'white' }}
         onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-soft)'; e.currentTarget.style.color = 'var(--accent-light)' }}

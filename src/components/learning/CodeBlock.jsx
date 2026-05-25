@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { escapeHtml } from '../../utils/safeHtml'
+import { useIsPhone } from '../../hooks/useMediaQuery'
 const CPP_TYPES = /\b(vector|string|pair|map|unordered_map|set|unordered_set|queue|stack|priority_queue|deque|list|array|tuple|shared_ptr|unique_ptr|weak_ptr|size_t|INT_MAX|INT_MIN|greater|less)\b/g
 
 const PY_KEYWORDS = /\b(def|class|if|elif|else|for|while|return|break|continue|pass|import|from|as|in|is|not|and|or|lambda|with|try|except|finally|raise|yield|async|await|True|False|None|self|cls|global|nonlocal|del|assert)\b/g
@@ -132,6 +133,7 @@ const HIGHLIGHTERS = {
 export default function CodeBlock({ code, lang = 'cpp', title, highlightLine, noAutoScroll = false, fill = false, maxHeight }) {
   const lineRefs = useRef({})
   const [copied, setCopied] = useState(false)
+  const isPhone = useIsPhone()
   // isFirstEffectRef handles the initial mount (incl. Strict Mode's double-invoke).
   // prevHighlightRef handles the later null→value transition when StepData first loads.
   // Without these, navigating to a new algo would auto-scroll <main> down to the
@@ -203,14 +205,17 @@ export default function CodeBlock({ code, lang = 'cpp', title, highlightLine, no
       </div>
       <pre style={{
         margin: 0,
-        padding: '16px 0',
+        padding: isPhone ? '12px 0' : '16px 0',
         fontFamily: 'var(--font-mono)',
-        fontSize: 13,
+        // 手机端字号缩到 11.5（最小不影响可读）
+        fontSize: isPhone ? 11.5 : 13,
         lineHeight: 1.7,
         overflow: 'auto',
         flex: fill ? '1 1 auto' : undefined,
         minHeight: fill ? 0 : undefined,
         maxHeight,
+        // iOS 滚动惯性
+        WebkitOverflowScrolling: 'touch',
       }}>
         <code style={{ display: 'block' }}>
           {lines.map((line, i) => {
@@ -225,7 +230,10 @@ export default function CodeBlock({ code, lang = 'cpp', title, highlightLine, no
                   transition: 'background 0.2s, border-color 0.2s',
                 }}>
                 <span style={{
-                  width: 44, textAlign: 'right', paddingRight: 16,
+                  // 手机端行号列宽 32 (节省 12px 给代码)，桌面 44
+                  width: isPhone ? 32 : 44,
+                  textAlign: 'right',
+                  paddingRight: isPhone ? 10 : 16,
                   color: isHl ? 'var(--accent-light)' : 'var(--text-tertiary)',
                   userSelect: 'none', opacity: isHl ? 1 : 0.5, flexShrink: 0,
                   fontWeight: isHl ? 700 : 400,

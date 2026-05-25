@@ -2,6 +2,10 @@
 import { regexToNfa } from '../../algorithms/compiler/regexToNfa'
 import { nfaToDfa } from '../../algorithms/compiler/nfaToDfa'
 import { buildAst } from '../../algorithms/compiler/buildAst'
+// 编译原理新增算法（等对应算法文件生成后取消注释）
+import { ll1Steps } from '../../algorithms/compiler/ll1'
+import { lr0Steps } from '../../algorithms/compiler/lr0'
+import { codeGenSteps } from '../../algorithms/compiler/codeGen'
 
 export const COMPILER_ALGORITHMS = {
   regexNfa: {
@@ -267,6 +271,315 @@ def parse_factor():
       'SQL 查询解析器',
       '表达式计算器、电子表格公式',
       '面试高频：手写一个四则运算计算器',
+    ],
+  },
+
+  ll1: {
+    slug: 'll1',
+    name: 'LL(1) 分析表',
+    nameEn: 'LL(1) Parse Table',
+    category: 'compilerSyn',
+    difficulty: '进阶',
+    fn: ll1Steps,
+    viz: 'll1',
+    timeComplexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)' },
+    spaceComplexity: 'O(|G|)',
+    stable: true,
+    inPlace: false,
+    description: '自顶向下的预测分析：先计算 FIRST/FOLLOW 集，构造 LL(1) 分析表，再用栈 + 输入串驱动解析。',
+    intuition: `**什么是 LL(1) 分析？**
+
+LL(1)：从**左**到右扫描输入，产生**最左**推导，向前看 **1** 个符号做决策。
+
+**三步走：**
+
+**第一步：计算 FIRST 集**
+\`FIRST(A)\` = 从 A 出发能推导出的所有串的首终结符集合。
+例：\`E → T E'\`，\`T → F T'\`，\`F → id | ( E )\`
+→ \`FIRST(F) = {id, (}\`，\`FIRST(T) = FIRST(F) = {id, (}\`，\`FIRST(E) = {id, (}\`
+
+**第二步：计算 FOLLOW 集**
+\`FOLLOW(A)\` = 在某个句型中紧跟 A 之后出现的终结符集合。
+\`FOLLOW(E) = {), $}\`（E 后面要么是 \`)\` 要么是串尾 \`$\`）
+
+**第三步：填表**
+对每条产生式 \`A → α\`：
+- 对 \`FIRST(α)\` 中每个终结符 \`a\`，填 \`M[A,a] = α\`
+- 若 ε ∈ \`FIRST(α)\`，再对 \`FOLLOW(A)\` 中每个终结符填 ε 产生式
+
+**解析过程（下推自动机）**
+栈：\`[$ E]\`，输入：\`id + id * id $\`
+查表 M[E, id] = T E'，弹出 E，压入 E' T（逆序压栈）
+循环直到栈空。`,
+    pseudocode: `// 计算 FIRST 集（迭代到不动点）
+function computeFirst(grammar):
+    for each terminal a: FIRST[a] = {a}
+    repeat until no change:
+        for each rule A → X1 X2 ... Xk:
+            add FIRST(X1) - {ε} to FIRST[A]
+            if ε ∈ FIRST(X1): add FIRST(X2) - {ε} ...
+            if all Xi can derive ε: add ε to FIRST[A]
+
+// 构建 LL(1) 分析表
+function buildTable(grammar, FIRST, FOLLOW):
+    for each rule A → α:
+        for each a in FIRST(α) - {ε}: M[A][a] = α
+        if ε in FIRST(α):
+            for each b in FOLLOW[A]: M[A][b] = ε
+
+// LL(1) 解析
+function parse(input, table):
+    stack = ['$', 'S']
+    while stack.top != '$':
+        X = stack.top; a = input.peek
+        if X is terminal: match and advance
+        else: push reverse(table[X][a])`,
+    code: {
+      cpp: `// FIRST 集计算（简化）
+map<char, set<char>> first;
+void computeFirst(vector<pair<char,string>>& rules) {
+    bool changed = true;
+    while (changed) { changed = false;
+        for (auto& [A, rhs] : rules) {
+            size_t before = first[A].size();
+            for (char X : rhs) {
+                for (char c : first[X]) if (c != 'e') first[A].insert(c);
+                if (!first[X].count('e')) break;
+                if (&X == &rhs.back()) first[A].insert('e');
+            }
+            if (first[A].size() != before) changed = true;
+        }
+    }
+}`,
+      python: `from collections import defaultdict
+
+def compute_first(rules):
+    first = defaultdict(set)
+    for t in 'id+*()$': first[t] = {t}
+    changed = True
+    while changed:
+        changed = False
+        for lhs, rhs in rules:
+            before = len(first[lhs])
+            for sym in rhs:
+                first[lhs] |= first[sym] - {'ε'}
+                if 'ε' not in first[sym]: break
+            else:
+                first[lhs].add('ε')
+            if len(first[lhs]) != before: changed = True
+    return first`,
+    },
+    applications: [
+      '手写解析器（Recursive Descent Parser 是 LL(1) 的递归实现）',
+      'JSON/XML/YAML 等配置文件解析器',
+      'GCC/Clang 前端（GCC 用 LALR(1)，理解 LL 是基础）',
+      '编译原理课大作业：实现 miniC 编译器',
+      '408 编译原理：语法分析章节必考点',
+    ],
+  },
+
+  lr0: {
+    slug: 'lr0',
+    name: 'LR(0) 归约',
+    nameEn: 'LR(0) Parsing',
+    category: 'compilerSyn',
+    difficulty: '进阶',
+    fn: lr0Steps,
+    viz: 'lr0',
+    timeComplexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)' },
+    spaceComplexity: 'O(|states|)',
+    stable: true,
+    inPlace: false,
+    description: '自底向上的移进-归约分析：构造 LR(0) 项集族（自动机），生成 ACTION/GOTO 表，用状态栈驱动解析。',
+    intuition: `**LR 分析为什么比 LL 更强？**
+
+LL(k) 只能向前看 k 个符号来决定用哪条产生式**展开**（自顶向下）。
+LR(k) 等待看到更多输入再决定是否**归约**（自底向上），能处理更多文法。
+
+**LR(0) 项（Item）**
+产生式带一个点 \`·\`，表示当前已看到点左边的符号：
+\`E → E · + T\`：已识别 \`E\`，等待 \`+ T\`
+\`E → E + T ·\`：点在最右，**可以归约**
+
+**构造 LR(0) 项集族**
+1. 增广文法加入 \`S' → · E\`
+2. \`closure\`：若项集含 \`A → α · B β\`，则加入所有 \`B → · γ\`
+3. \`goto(I, X)\`：把 I 中所有 \`A → α · X β\` 的点右移一位，再取 closure
+
+**ACTION 表（移进/归约）**
+- 点在字符前 → 移进（shift）
+- 点在最右 → 归约（reduce）
+
+**解析过程**
+状态栈 + 符号栈，每步查 ACTION 表决定 shift 还是 reduce：
+- shift：把下一个输入压栈
+- reduce：弹出产生式右部长度的栈帧，查 GOTO 压新状态`,
+    pseudocode: `// 构造 LR(0) 项集族
+function buildItems(grammar):
+    I0 = closure({S' → ·S})
+    C = {I0}
+    repeat:
+        for each I in C, symbol X:
+            J = goto(I, X)
+            if J not empty and J not in C: add J to C
+
+function goto(I, X):
+    J = { A→αX·β | A→α·Xβ ∈ I }
+    return closure(J)
+
+// 填 ACTION 表
+for each state I:
+    for each [A→α·aβ] in I: ACTION[I][a] = shift goto(I,a)
+    for each [A→α·] in I: ACTION[I][*] = reduce A→α
+
+// 解析循环
+function parse(input, table):
+    stack = [0]
+    while True:
+        s = stack.top; a = input.peek
+        if ACTION[s][a] = shift t: push t; advance
+        elif ACTION[s][a] = reduce A→β:
+            pop |β| states; push GOTO[stack.top][A]
+        elif ACTION[s][a] = accept: return OK`,
+    code: {
+      cpp: `struct Item { int rule, dot; };
+set<Item> closure(set<Item> items, Grammar& g) {
+    bool changed = true;
+    while (changed) { changed = false;
+        for (auto& [r, d] : items) {
+            char B = g.rules[r].rhs[d]; // symbol after dot
+            for (int i = 0; i < g.rules.size(); i++)
+                if (g.rules[i].lhs == B)
+                    changed |= items.insert({i, 0}).second;
+        }
+    }
+    return items;
+}`,
+      python: `def closure(items, grammar):
+    items = set(items)
+    changed = True
+    while changed:
+        changed = False
+        for (rule_id, dot) in list(items):
+            rhs = grammar[rule_id][1]
+            if dot < len(rhs):
+                B = rhs[dot]
+                for i, (lhs, _) in enumerate(grammar):
+                    if lhs == B and (i, 0) not in items:
+                        items.add((i, 0)); changed = True
+    return items`,
+    },
+    applications: [
+      'yacc / bison（LALR(1) 是 LR(0) 的加强版，底层思路相同）',
+      'GCC、Clang 的语法分析器底层',
+      '编译原理课大作业：实现 LR 分析器',
+      '面试高频：「LL 和 LR 分析的区别？LR(1) 比 LR(0) 多什么？」',
+      '408 编译原理：语法分析第二部分必考',
+    ],
+  },
+
+  codeGen: {
+    slug: 'codeGen',
+    name: '代码生成',
+    nameEn: 'Code Generation (TAC → ASM)',
+    category: 'compilerCode',
+    difficulty: '进阶',
+    fn: codeGenSteps,
+    viz: 'codeGen',
+    timeComplexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)' },
+    spaceComplexity: 'O(n)',
+    stable: true,
+    inPlace: false,
+    description: '编译器后端：将 AST 翻译为三地址码（TAC），再映射到简单伪汇编指令序列，展示表达式求值顺序与临时变量分配。',
+    intuition: `**前端产出 AST，后端怎么变成机器码？**
+
+编译器后端分三步：
+1. **AST → 中间表示（IR / TAC）**：把树状结构线性化
+2. **IR 优化**（常量折叠、公共子表达式消除等，本可视化略）
+3. **IR → 目标代码**（寄存器分配 + 指令选择）
+
+**三地址码（Three-Address Code）**
+每条指令最多三个操作数，形如 \`t1 = b + c\`。
+这种形式很适合后续优化和寄存器分配。
+
+**AST 后序遍历 → TAC**
+对 \`a = (b + c) * d\`：
+\`\`\`
+后序遍历：b → c → + → d → * → a → =
+生成：t1 = b + c
+      t2 = t1 * d
+      a  = t2
+\`\`\`
+
+**TAC → 伪汇编**
+每条 TAC 指令映射到若干汇编指令：
+\`\`\`
+t1 = b + c  →  LOAD r1, b
+                LOAD r2, c
+                ADD  r1, r1, r2
+                STORE t1, r1
+\`\`\`
+
+**临时变量（Temps）**：编译器自动分配 t1、t2、t3 等，不对应源码变量，只在寄存器分配后才知道用哪个物理寄存器。`,
+    pseudocode: `// AST → 三地址码（后序遍历）
+function genCode(node):
+    case node.type of
+        Lit(v):  return v              // 字面量直接返回
+        Var(x):  return x              // 变量直接返回
+        BinOp(op, l, r):
+            lv = genCode(l)
+            rv = genCode(r)
+            t = newTemp()             // 分配新临时变量
+            emit(t + " = " + lv + op + rv)
+            return t
+        Assign(x, expr):
+            v = genCode(expr)
+            emit(x + " = " + v)
+
+// TAC → 汇编（简化，不做寄存器分配）
+function tacToAsm(tac):
+    for instr in tac:
+        match instr:
+            "t = a op b":
+                emit LOAD r1, a
+                emit LOAD r2, b
+                emit OP  r1, r1, r2
+                emit STORE t, r1
+            "x = t":
+                emit LOAD r1, t
+                emit STORE x, r1`,
+    code: {
+      cpp: `string genCode(ASTNode* n, vector<string>& code, int& tmp) {
+    if (n->type == Lit) return n->val;
+    if (n->type == Var) return n->name;
+    string l = genCode(n->left, code, tmp);
+    string r = genCode(n->right, code, tmp);
+    string t = "t" + to_string(++tmp);
+    code.push_back(t + " = " + l + " " + n->op + " " + r);
+    return t;
+}
+// 调用入口
+void compile(ASTNode* root) {
+    vector<string> tac; int tmp = 0;
+    genCode(root, tac, tmp);
+    for (auto& line : tac) cout << line << "\\n";
+}`,
+      python: `def gen_code(node, code, temps):
+    if node['type'] == 'Lit': return str(node['val'])
+    if node['type'] == 'Var': return node['name']
+    l = gen_code(node['left'], code, temps)
+    r = gen_code(node['right'], code, temps)
+    t = f't{len(temps)+1}'
+    temps[t] = f'{l}{node["op"]}{r}'
+    code.append(f'{t} = {l} {node["op"]} {r}')
+    return t`,
+    },
+    applications: [
+      '编译器后端：GCC -O0 不优化时的代码生成',
+      'LLVM IR：现代编译器的中间表示层',
+      '即时编译（JIT）：Python / JavaScript 引擎把字节码编译为机器码',
+      '静态分析工具：通过 TAC 做控制流/数据流分析',
+      '408 编译原理：中间代码生成章节',
     ],
   },
 }

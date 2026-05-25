@@ -120,7 +120,7 @@ A: 需要更新步骤对象中对应的 `cppLine` 或 `pythonLine` 值。
 ## 📂 相关文件
 
 - **CODE_HIGHLIGHTING_GUIDE.md** - 详细实现指南
-- **EXAMPLE_CODE_LINES.js** - 完整示例代码
+- **../examples/EXAMPLE_CODE_LINES.js** - 完整示例代码
 - **CHANGES_SUMMARY.md** - 修改总结
 
 ---

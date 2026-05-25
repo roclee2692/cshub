@@ -121,6 +121,12 @@ export const CATEGORIES = {
     "icon": "🌲",
     "color": "#ef4444",
     "desc": "递归下降、LL/LR 等语法分析与 AST 构建"
+  },
+  "compilerCode": {
+    "name": "代码生成",
+    "icon": "⚙️",
+    "color": "#8b5cf6",
+    "desc": "AST → 三地址码 → 伪汇编的代码生成过程"
   }
 }
 

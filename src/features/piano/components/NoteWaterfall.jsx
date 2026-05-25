@@ -43,7 +43,7 @@ export default function NoteWaterfall({ notes, currentBeat, visibleKeys, fallBea
   )
 
   return (
-    <div className="w-full overflow-hidden rounded-3xl border-2 border-[#f5d9b8] bg-gradient-to-b from-[#fff4e6] via-[#fff7ed] to-[#fdebd3]" style={{ height }}>
+    <div className="piano-waterfall w-full overflow-hidden rounded-3xl border-2 border-[#f5d9b8] bg-gradient-to-b from-[#fff4e6] via-[#fff7ed] to-[#fdebd3]" style={{ height }}>
       <svg
         viewBox={`0 0 ${totalWidth} ${height}`}
         preserveAspectRatio="none"

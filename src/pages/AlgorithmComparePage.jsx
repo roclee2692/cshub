@@ -69,10 +69,10 @@ export default function AlgorithmComparePage() {
               fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
               color: 'var(--accent-light)', textTransform: 'uppercase', marginBottom: 8,
             }}>算法对比</div>
-            <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>
+            <h1 style={{ fontSize: 'clamp(24px, 5.4vw, 40px)', fontWeight: 800, letterSpacing: '-0.04em', margin: 0, lineHeight: 1.1 }}>
               同屏对比两个算法
             </h1>
-            <p style={{ margin: '10px 0 0', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 760 }}>
+            <p style={{ margin: '10px 0 0', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 760, fontSize: 'clamp(13px, 2.6vw, 14.5px)' }}>
               通过动画、代码和复杂度并排比较，快速看清“为什么选这个算法”。适合教学、选型和复习。
             </p>
           </div>

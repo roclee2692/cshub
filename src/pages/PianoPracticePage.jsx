@@ -123,19 +123,19 @@ export default function PianoPracticePage() {
 
   if (!rawSong) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fff5ec] to-[#fdebd3] flex items-center justify-center p-8">
+      <div className="piano-practice-page min-h-screen bg-gradient-to-b from-[#fff5ec] to-[#fdebd3] flex items-center justify-center p-8">
         <div className="text-center max-w-md">
           <p className="text-6xl mb-4">🎹</p>
-          <h1 className="text-2xl font-black text-[#3d2a2a] mb-2">找不到这首曲子</h1>
-          <p className="text-[#9e7f7f] mb-6">slug "{slug}" 不在曲库里。</p>
-          <Link to="/piano" className="rounded-full bg-[#e86c5d] px-6 py-2 text-white font-bold">← 回曲库</Link>
+          <h1 className="piano-missing-title text-2xl font-black text-[#3d2a2a] mb-2">找不到这首曲子</h1>
+          <p className="piano-missing-copy text-[#9e7f7f] mb-6">slug "{slug}" 不在曲库里。</p>
+          <Link to="/piano" className="piano-missing-link rounded-full bg-[#e86c5d] px-6 py-2 text-white font-bold">← 回曲库</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff5ec] via-[#fff8f0] to-[#fdebd3] py-6">
+    <div className="piano-practice-page min-h-screen bg-gradient-to-b from-[#fff5ec] via-[#fff8f0] to-[#fdebd3] py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col gap-4">
         <PracticeToolbar
           song={song}
@@ -154,7 +154,7 @@ export default function PianoPracticePage() {
           starting={starting}
         />
 
-        <div className="rounded-3xl border-2 border-dashed border-[#f5d9b8] bg-white/70 px-5 py-2.5 text-center text-sm font-semibold text-[#9e7f7f]">
+        <div className="piano-feedback-strip rounded-3xl border-2 border-dashed border-[#f5d9b8] bg-white/70 px-5 py-2.5 text-center text-sm font-semibold text-[#9e7f7f]">
           {feedback}
           {!loaded && starting && <span className="ml-2 text-[#e86c5d]">（采样首次加载，请稍候）</span>}
         </div>
@@ -175,7 +175,7 @@ export default function PianoPracticePage() {
           showLabels
         />
 
-        <p className="text-center text-xs text-[#b78a6e]">
+        <p className="piano-helper-text text-center text-xs text-[#b78a6e]">
           电脑键盘：A S D F G H J K L ; = 白键 · W E T Y U O P = 黑键 · 空格 = 播放/暂停
         </p>
       </div>

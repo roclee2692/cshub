@@ -2,29 +2,17 @@ import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 're
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
+import { useViewport } from '../hooks/useMediaQuery'
 import DynamicIsland, { IslandDivider } from './DynamicIsland'
+import { NAV_ITEMS } from './navItems'
 
 const SearchPalette = lazy(() => import('../components/SearchPalette'))
 const NAV_INDICATOR_WIDTH = 42
 
-// 参考图 1:1 NAV：icon + 中文标签，活跃项底部紫色下划线
-const NAV_ITEMS = [
-  { id: 'home', to: '/', label: '首页', icon: '🏠', match: pathname => pathname === '/' },
-  {
-    id: 'learn',
-    to: '/learn',
-    label: '资源导航',
-    icon: '🧭',
-    match: pathname => pathname === '/learn' || pathname === '/path' || pathname.startsWith('/path/') || ['/roadmap', '/projects', '/interview', '/toolbox', '/setup'].includes(pathname),
-  },
-  { id: 'algo', to: '/algo/bubblesort', label: '算法库', icon: '📊', match: pathname => pathname.startsWith('/algo/') || pathname.startsWith('/compare') },
-  { id: 'logic', to: '/logic', label: '逻辑学', icon: '🧠', match: pathname => pathname === '/logic' },
-  { id: 'finance', to: '/finance', label: '理财', icon: '💰', match: pathname => pathname === '/finance' },
-  { id: 'growth', to: '/growth', label: '个人成长', icon: '🌱', match: pathname => pathname === '/growth' },
-]
-
 export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpen = false }) {
   const { pathname } = useLocation()
+  const viewport = useViewport()
+  const isPhone = viewport === 'phone'
   const [searchOpen, setSearchOpen] = useState(false)
   const navRef = useRef(null)
   const activeNavId = NAV_ITEMS.find(item => item.match(pathname))?.id
@@ -97,19 +85,31 @@ export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpe
           </GlassBtn>
         )}
 
-        {/* Logo + 品牌字 · CS Hub 强制不换行 */}
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0, whiteSpace: 'nowrap' }}>
+        {/* Logo + 品牌字 · CS Hub 强制不换行；手机端隐藏文字仅留 logo 节省横向空间 */}
+        <Link
+          to="/"
+          aria-label="CS Hub 首页"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0, whiteSpace: 'nowrap' }}
+        >
           <Logo />
-          <span style={{
-            fontWeight: 800,
-            fontSize: 16,
-            letterSpacing: '-0.02em',
-            color: 'var(--text-primary)',
-            whiteSpace: 'nowrap',
-          }}>CS Hub</span>
+          {!isPhone && (
+            <span style={{
+              fontWeight: 800,
+              fontSize: 16,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              whiteSpace: 'nowrap',
+            }}>CS Hub</span>
+          )}
         </Link>
 
-        <IslandDivider />
+        {/* logo 和主导航之间的分隔线：手机端导航整组隐藏时，此分隔线也随之隐藏 */}
+        {!isPhone && (
+          <span aria-hidden className="topbar-nav-divider" style={{
+            flexShrink: 0, width: 1, height: 22,
+            background: 'currentColor', opacity: 0.16, margin: '0 6px',
+          }} />
+        )}
 
         {/* iPad Dock 中央：主导航 */}
         <nav ref={navRef} className="topbar-nav" style={{ position: 'relative', display: 'flex', gap: 2, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
@@ -304,10 +304,11 @@ function GlassBtn({ children, onClick, ...props }) {
 function ThemeToggle() {
   const { theme, toggle } = useTheme()
   const isDark = theme === 'dark'
+
   return (
     <button
       onClick={toggle}
-      title={isDark ? '切换到浅色模式' : '切换到深色模式'}
+      title={isDark ? '切换浅色' : '切换深色'}
       style={{
         ...glassBtnStyle,
         position: 'relative',
@@ -324,9 +325,7 @@ function ThemeToggle() {
     >
       <span style={{
         position: 'absolute',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s',
         transform: isDark ? 'translateY(0)' : 'translateY(-34px)',
         opacity: isDark ? 1 : 0,
@@ -335,9 +334,7 @@ function ThemeToggle() {
       </span>
       <span style={{
         position: 'absolute',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s',
         transform: !isDark ? 'translateY(0)' : 'translateY(34px)',
         opacity: !isDark ? 1 : 0,

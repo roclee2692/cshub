@@ -13,12 +13,15 @@ const AlgorithmComparePage = lazy(() => import('./pages/AlgorithmComparePage'))
 const GitHubGuidePage = lazy(() => import('./pages/GitHubGuidePage'))
 const AIGuidePage = lazy(() => import('./pages/AIGuidePage'))
 const FinancePage = lazy(() => import('./pages/FinancePage'))
+const StockMarketPage = lazy(() => import('./pages/StockMarketPage'))
 const InterviewGuidePage = lazy(() => import('./pages/InterviewGuidePage'))
 const RoadmapPage = lazy(() => import('./pages/RoadmapPage'))
 const ToolboxPage = lazy(() => import('./pages/ToolboxPage'))
 const ProjectsGuidePage = lazy(() => import('./pages/ProjectsGuidePage'))
 const SetupGuidePage = lazy(() => import('./pages/SetupGuidePage'))
 const PersonalGrowthPage = lazy(() => import('./pages/PersonalGrowthPage'))
+const HealthPage = lazy(() => import('./pages/HealthPage'))
+const BookNotesPage = lazy(() => import('./pages/BookNotesPage'))
 const PianoPage = lazy(() => import('./pages/PianoPage'))
 const PianoLessonPage = lazy(() => import('./pages/PianoLessonPage'))
 const PianoPracticePage = lazy(() => import('./pages/PianoPracticePage'))
@@ -61,12 +64,15 @@ export default function App() {
             <Route path="/github" element={<GitHubGuidePage />} />
             <Route path="/ai" element={<AIGuidePage />} />
             <Route path="/finance" element={<FinancePage />} />
+            <Route path="/finance/stocks" element={<StockMarketPage />} />
             <Route path="/interview" element={<InterviewGuidePage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/toolbox" element={<ToolboxPage />} />
             <Route path="/projects" element={<ProjectsGuidePage />} />
             <Route path="/setup" element={<SetupGuidePage />} />
             <Route path="/growth" element={<PersonalGrowthPage />} />
+            <Route path="/health" element={<HealthPage />} />
+            <Route path="/books/:slug" element={<BookNotesPage />} />
             <Route path="/piano" element={<PianoPage />} />
             <Route path="/piano/lesson/:lessonId" element={<PianoLessonPage />} />
             <Route path="/piano/practice/:slug" element={<PianoPracticePage />} />

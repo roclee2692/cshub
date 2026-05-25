@@ -37,14 +37,14 @@ export default function PianoKeyboard({ visibleKeys, activeNotes, targetNote, on
     <div className="w-full overflow-x-auto pb-2">
       <svg
         viewBox={`0 0 ${totalWidth} ${WHITE_H + 24}`}
-        className="block mx-auto"
+        className="piano-keyboard-svg block mx-auto"
         style={{ width: '100%', minWidth: Math.min(totalWidth, 1600), maxWidth: totalWidth }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <linearGradient id="key-white" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#fffaf3" />
-            <stop offset="100%" stopColor="#f5e8d6" />
+            <stop offset="0%" stopColor="var(--piano-key-white-top, #fffaf3)" />
+            <stop offset="100%" stopColor="var(--piano-key-white-bottom, #f5e8d6)" />
           </linearGradient>
           <linearGradient id="key-white-active" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#ffd5b8" />
@@ -55,8 +55,8 @@ export default function PianoKeyboard({ visibleKeys, activeNotes, targetNote, on
             <stop offset="100%" stopColor="#f6d057" />
           </linearGradient>
           <linearGradient id="key-black" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3a2d2a" />
-            <stop offset="100%" stopColor="#1a1212" />
+            <stop offset="0%" stopColor="var(--piano-key-black-top, #3a2d2a)" />
+            <stop offset="100%" stopColor="var(--piano-key-black-bottom, #1a1212)" />
           </linearGradient>
           <linearGradient id="key-black-active" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#ff8a78" />

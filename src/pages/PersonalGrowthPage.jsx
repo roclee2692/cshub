@@ -18,6 +18,18 @@ const MORE_ITEMS = [
   { icon: '📷', title: '记录生活', desc: '拍的不好没有关系，没有记录下来才是最可惜的，因为很多事情过后，已经不能凭空想象起来' },
 ]
 
+const TALENT_ITEMS = [
+  { icon: '🧭', title: '找到天然兴奋点', desc: '回顾那些不需要别人催促、你也愿意反复研究的事情。天赋常常不是“轻松赢”，而是“愿意持续投入”。' },
+  { icon: '🧩', title: '识别高反馈场景', desc: '观察别人经常向你请教什么、你在哪类任务里学得比同龄人快。外部反馈能帮你校准自我感受。' },
+  { icon: '📝', title: '做三十天小实验', desc: '不要只靠性格测试下结论。选一个方向做低成本作品、分享或服务，用真实结果判断它是否值得长期投入。' },
+]
+
+const SURVIVAL_ITEMS = [
+  { number: '01', title: '租房先保底线', desc: '优先看通勤、合同、押金、室友和安全。预算尽量控制在税后收入的三分之一以内，第一次租房不要为了“看起来体面”透支现金流。' },
+  { number: '02', title: '建立三个月缓冲金', desc: '毕业初期不确定性高，先把房租、吃饭、交通、通讯等基础支出算清楚，再逐步攒出 3-6 个月生活费。' },
+  { number: '03', title: '学会处理生活事务', desc: '保留合同、发票和聊天记录；学会报修、搬家、体检、社保、公积金和基础法律常识。这些能力会直接降低生活摩擦。' },
+]
+
 export default function PersonalGrowthPage() {
 
   return (
@@ -175,10 +187,50 @@ export default function PersonalGrowthPage() {
           </div>
         </section>
 
-        {/* 03 More */}
+        {/* 03 Talent */}
         <section className="gp-section">
           <div className="gp-section-header">
-            <span className="gp-tag gp-tag-purple">03 / MORE</span>
+            <span className="gp-tag gp-tag-gold">03 / TALENT</span>
+            <div>
+              <h2 className="gp-section-title">发现自我天赋：把热爱变成方向</h2>
+              <p className="gp-section-desc">天赋不是一句“我适合什么”的标签，而是一组需要被观察、验证和迭代的线索。先找到能让你长期投入的事情，再把它训练成能力。</p>
+            </div>
+          </div>
+          <div className="gp-cards">
+            {TALENT_ITEMS.map(item => (
+              <div className="gp-card" key={item.title}>
+                <div className="gp-card-icon">{item.icon}</div>
+                <h3 className="gp-card-title">{item.title}</h3>
+                <p className="gp-card-desc">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 04 Survival */}
+        <section className="gp-section">
+          <div className="gp-section-header">
+            <span className="gp-tag gp-tag-blue">04 / SURVIVAL</span>
+            <div>
+              <h2 className="gp-section-title">毕业大学生如何生存：先把生活跑通</h2>
+              <p className="gp-section-desc">刚毕业最重要的不是一步到位，而是让现金流、住所、健康和工作节奏稳定下来。先减少失误成本，再慢慢追求更好的选择。</p>
+            </div>
+          </div>
+          <div className="gp-cards">
+            {SURVIVAL_ITEMS.map(item => (
+              <div className="gp-card" key={item.title}>
+                <div className="gp-card-num">{item.number}</div>
+                <h3 className="gp-card-title">{item.title}</h3>
+                <p className="gp-card-desc">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 05 More */}
+        <section className="gp-section">
+          <div className="gp-section-header">
+            <span className="gp-tag gp-tag-purple">05 / MORE</span>
             <div>
               <h2 className="gp-section-title">更多成长方向</h2>
               <p className="gp-section-desc">内心的充盈不仅来源于工作上的成就，更源于对生活广度的探索。无论独处还是群居，都能找到生命的丰富多彩。</p>

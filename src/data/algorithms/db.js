@@ -2,6 +2,8 @@
 import { bplustree } from '../../algorithms/database/bPlusTree'
 import { txnIsolation } from '../../algorithms/database/transaction'
 import { hashJoin } from '../../algorithms/database/hashJoin'
+import { mvccDemo } from '../../algorithms/database/mvcc'
+import { queryPlanSteps } from '../../algorithms/database/queryPlan'
 
 export const DB_ALGORITHMS = {
   bplustree: {
@@ -238,6 +240,197 @@ def hash_join(R, S, key_R, key_S):
       'MySQL 8.0 起默认 join 算法',
       '数据仓库星型模型的事实表 × 维度表',
       '面试高频：「Join 有几种实现？为什么这种 SQL 慢？」',
+    ],
+  },
+
+  mvcc: {
+    slug: 'mvcc',
+    name: 'MVCC',
+    nameEn: 'Multi-Version Concurrency Control',
+    category: 'dbTxn',
+    difficulty: '进阶',
+    fn: mvccDemo,
+    viz: 'mvcc',
+    timeComplexity: { best: 'O(1)', average: 'O(v)', worst: 'O(v)' },
+    spaceComplexity: 'O(v·n)',
+    stable: true,
+    inPlace: false,
+    description: '多版本并发控制：每次写操作保留旧版本，读操作依据事务快照选择可见版本，读写互不阻塞。',
+    intuition: `**为什么读写不用互相等待？**
+
+传统锁机制下，读要等写释放锁，写要等读释放锁——高并发时性能崩塌。MVCC 的思路是：**写操作不覆盖旧数据，而是追加新版本**。读操作根据自己的「快照」决定看哪个版本。
+
+**版本链**
+每行数据不再是单条记录，而是一条版本链：
+\`\`\`
+id=1: [value=100, xmin=T1, xmax=T3] → [value=200, xmin=T3, xmax=null]
+\`\`\`
+- \`xmin\`：创建该版本的事务 id
+- \`xmax\`：删除/覆盖该版本的事务 id（null 表示当前有效）
+
+**快照隔离（Snapshot Isolation）**
+事务启动时记录「当时哪些事务活跃」，这个集合叫快照（snapshot）。
+读一个版本时，可见条件：
+1. \`xmin\` 已提交 且 \`xmin\` **不在** 快照集合中（即 xmin 在我启动之前已提交）
+2. \`xmax\` 为 null，或 \`xmax\` **在** 快照集合中（即 xmax 还未提交，覆盖对我不可见）
+
+**结论**：T1 启动后，T2 更新了某行并提交，T1 照样看到旧版本——快照冻住了世界。`,
+    pseudocode: `// 写：追加新版本
+procedure write(row, newVal, txn):
+    oldVersion.xmax ← txn.id          // 标记旧版本被覆盖
+    append new version {
+        value: newVal,
+        xmin: txn.id,
+        xmax: null
+    }
+
+// 读：按快照过滤
+procedure read(row, txn):
+    for each version v in row.chain:
+        if isVisible(v, txn): return v.value
+
+function isVisible(v, txn):
+    return committed(v.xmin)
+        and v.xmin not in txn.snapshot
+        and (v.xmax is null
+             or not committed(v.xmax)
+             or v.xmax in txn.snapshot)
+
+// Vacuum：清理不再被任何活跃快照引用的旧版本
+procedure vacuum(rows, activeSnapshots):
+    min_active ← min(activeSnapshots)
+    for each version v where v.xmax < min_active:
+        remove v`,
+    code: {
+      cpp: `// PostgreSQL 可见性简化版
+struct Version { int xmin, xmax; int value; };
+struct Txn { int id; vector<int> snapshot; };
+
+bool isVisible(Version v, Txn& txn, set<int>& committed) {
+    // xmin 必须已提交且不在快照中
+    if (!committed.count(v.xmin)) return false;
+    if (find(txn.snapshot, v.xmin)) return false;
+    // xmax 为空，或还未提交，或在快照中（被此后事务删）
+    if (v.xmax == 0) return true;
+    if (!committed.count(v.xmax)) return true;
+    return find(txn.snapshot, v.xmax);
+}`,
+      python: `# MVCC 可见性判断
+def is_visible(version, txn, committed):
+    xmin, xmax = version['xmin'], version['xmax']
+    # xmin 已提交且不在快照（快照前已提交）
+    if xmin not in committed: return False
+    if xmin in txn['snapshot']: return False
+    # xmax 为 None 或未提交或在快照中
+    if xmax is None: return True
+    if xmax not in committed: return True
+    return xmax in txn['snapshot']`,
+    },
+    applications: [
+      'PostgreSQL、MySQL InnoDB 的并发读写核心机制',
+      '快照隔离（Snapshot Isolation）与 Serializable SI',
+      'CockroachDB / TiDB 等分布式数据库的 MVCC 实现',
+      'Git 提交历史：每次提交保留快照，可随时回溯',
+      '408 数据库课：并发控制、事务隔离级别章节',
+    ],
+  },
+
+  queryPlan: {
+    slug: 'queryPlan',
+    name: '查询计划',
+    nameEn: 'Query Plan (Volcano Model)',
+    category: 'dbQuery',
+    difficulty: '进阶',
+    fn: queryPlanSteps,
+    viz: 'queryPlan',
+    timeComplexity: { best: 'O(n)', average: 'O(n log n)', worst: 'O(n²)' },
+    spaceComplexity: 'O(n)',
+    stable: true,
+    inPlace: false,
+    description: '数据库查询执行器将 SQL 翻译成算子树（Volcano 模型），数据从叶子节点向上逐层拉取、过滤、聚合，直到根节点吐出结果。',
+    intuition: `**SQL 是声明式的，数据库怎么执行？**
+
+你写 \`SELECT ... FROM ... WHERE ... JOIN ... GROUP BY\`，数据库先通过查询优化器生成**执行计划**——一棵算子树。
+
+**Volcano / Iterator 模型**
+每个算子实现同一套接口：\`open() / next() / close()\`。
+父节点调 \`next()\`，子节点才去拉数据——这叫**拉取模型（pull model）**。
+数据从叶子（SeqScan / IndexScan）向上流，经过 Filter、Join、Sort、Aggregate，最终到达根节点。
+
+**常见算子**
+- **SeqScan**：全表扫描，逐行读磁盘页
+- **IndexScan**：走 B+ 树索引，精确定位后回表
+- **Filter**：按条件过滤，不满足直接丢弃
+- **HashJoin**：Build 阶段把小表存进哈希表，Probe 阶段逐行探测
+- **Sort**：外部排序（ORDER BY）
+- **Aggregate**：GROUP BY + 聚合函数（SUM/COUNT/AVG）
+- **Limit**：截取前 N 行
+
+**代价估算**：优化器给每个节点估算 \`cost\`（I/O + CPU）和输出行数 \`rows\`，选择总代价最低的计划。`,
+    pseudocode: `// Volcano 模型：每个算子实现 next()
+interface Iterator { Tuple next(); }
+
+class SeqScan implements Iterator:
+    next() → read next page, return row
+
+class Filter(child, predicate) implements Iterator:
+    next():
+        loop: t = child.next()
+              if predicate(t): return t
+
+class HashJoin(build, probe, key) implements Iterator:
+    open():
+        // Build phase: fill hash table
+        while t = build.next(): hashTable[t[key]].add(t)
+    next():
+        // Probe phase
+        while t = probe.next():
+            if t[key] in hashTable: return join(t, hashTable[t[key]])
+
+class Aggregate(child, groupBy, agg) implements Iterator:
+    open(): compute groups from child
+    next(): return next group result`,
+    code: {
+      cpp: `// 简化版 Volcano 模型
+struct Tuple { map<string, Value> cols; };
+struct Iterator { virtual Tuple* next() = 0; };
+
+struct Filter : Iterator {
+    Iterator* child; function<bool(Tuple&)> pred;
+    Tuple* next() override {
+        while (auto t = child->next())
+            if (pred(*t)) return t;
+        return nullptr;
+    }
+};
+struct HashJoin : Iterator {
+    unordered_map<Value, vector<Tuple>> ht;
+    void open() { while (auto t = build->next()) ht[t->cols[key]].push_back(*t); }
+    Tuple* next() override { /* probe */ }
+};`,
+      python: `# Volcano 迭代器模型
+class SeqScan:
+    def __init__(self, table): self.rows = iter(table)
+    def next(self): return next(self.rows, None)
+
+class Filter:
+    def __init__(self, child, pred): self.child, self.pred = child, pred
+    def next(self):
+        while (t := self.child.next()) is not None:
+            if self.pred(t): return t
+
+class HashJoin:
+    def __init__(self, build, probe, key): ...
+    def open(self):
+        self.ht = {}
+        while (t := self.build.next()): self.ht.setdefault(t[self.key],[]).append(t)`,
+    },
+    applications: [
+      'MySQL EXPLAIN / PostgreSQL EXPLAIN ANALYZE 输出的执行计划树',
+      'Spark 的 DAG 执行引擎（同样是算子树）',
+      '数据库内核开发：实现一个简单 SQL 执行引擎',
+      '面试高频：「为什么这条 SQL 慢？」背后的执行计划分析',
+      '408 数据库课：查询处理与查询优化章节',
     ],
   },
 }

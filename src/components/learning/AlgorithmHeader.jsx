@@ -1,5 +1,6 @@
 import { CATEGORIES } from '../../data/algorithmMeta'
 import { useProgress } from '../../contexts/ProgressContext'
+import { useIsPhone } from '../../hooks/useMediaQuery'
 
 const TEXT = {
   favorite: '\u6536\u85cf',
@@ -90,6 +91,7 @@ export default function AlgorithmHeader({ algo }) {
   const { isFavorite, isCompleted, toggleFavorite, toggleCompleted } = useProgress()
   const fav = isFavorite(algo.slug)
   const done = isCompleted(algo.slug)
+  const isPhone = useIsPhone()
   const meta = CATEGORY_META[algo.category] || {
     label: cat?.name || '',
     color: cat?.color || '#8b5cf6',
@@ -101,16 +103,16 @@ export default function AlgorithmHeader({ algo }) {
 
   return (
     <section style={{
-      marginBottom: 34,
+      marginBottom: isPhone ? 20 : 34,
       position: 'relative',
       overflow: 'hidden',
-      borderRadius: 28,
+      borderRadius: isPhone ? 18 : 28,
       border: '1px solid var(--glass-border-strong)',
       background: 'linear-gradient(135deg, var(--glass-bg-mid), var(--glass-bg))',
       backdropFilter: 'blur(42px) saturate(210%)',
       WebkitBackdropFilter: 'blur(42px) saturate(210%)',
       boxShadow: `0 18px 60px ${meta.color}18, var(--glass-shine)`,
-      padding: '30px 32px',
+      padding: isPhone ? '18px 18px' : '30px 32px',
     }}>
       <div style={{
         position: 'absolute',
@@ -158,11 +160,12 @@ export default function AlgorithmHeader({ algo }) {
           </div>
 
           <h1 className="algo-title" style={{
-            fontSize: 42,
+            // 桌面 42 / iPad 36 / 手机由 CSS @768 强制 28
+            fontSize: isPhone ? 26 : 42,
             fontWeight: 850,
             margin: 0,
             letterSpacing: '-0.03em',
-            lineHeight: 1.05,
+            lineHeight: 1.08,
             color: 'var(--text-primary)',
           }}>
             {title}
@@ -191,10 +194,12 @@ export default function AlgorithmHeader({ algo }) {
 
         <div style={{
           display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
+          // 手机端横排两个按钮，避免一行内一个按钮独占
+          flexDirection: isPhone ? 'row' : 'column',
+          gap: 8,
           alignItems: 'stretch',
-          minWidth: 132,
+          minWidth: isPhone ? 0 : 132,
+          flexWrap: 'wrap',
         }}>
           <GlassActionBtn
             active={fav}

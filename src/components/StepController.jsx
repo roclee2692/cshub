@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useStepPublish } from '../contexts/StepContext'
+import { useIsPhone } from '../hooks/useMediaQuery'
 
 const SPEED_PRESETS = [
   { label: '0.5×', ms: 2000 },
@@ -65,6 +66,7 @@ export default function StepController({
 }) {
   const scrubberRef = useRef(null)
   const isDragging = useRef(false)
+  const isPhone = useIsPhone()
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function StepController({
       border: '1px solid var(--glass-border)',
       boxShadow: 'var(--glass-shadow), var(--glass-shine)',
       borderRadius: 'var(--r-lg)',
-      padding: '14px 16px',
+      padding: isPhone ? '12px 12px' : '14px 16px',
     }}>
       {/* Description */}
       <div style={{
@@ -133,16 +135,18 @@ export default function StepController({
         <span style={{ lineHeight: 1.6, color: 'var(--accent-light)' }}>{description || '—'}</span>
       </div>
 
-      {/* Scrubber timeline */}
+      {/* Scrubber timeline · 手机端拉高至 32 增大触摸命中区 */}
       <div
         ref={scrubberRef}
         onMouseDown={handleScrubberMouseDown}
+        onTouchStart={handleScrubberTouch}
         onTouchMove={handleScrubberTouch}
         style={{
-          position: 'relative', height: 22,
+          position: 'relative', height: isPhone ? 32 : 22,
           display: 'flex', alignItems: 'center',
           cursor: 'pointer', marginBottom: 12,
           userSelect: 'none',
+          touchAction: 'none',
         }}
       >
         {/* Track */}
@@ -193,26 +197,26 @@ export default function StepController({
 
       {/* Controls row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-        <IconBtn onClick={reset} title="重置">
+        <IconBtn onClick={reset} title="重置" isPhone={isPhone}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
           </svg>
         </IconBtn>
-        <IconBtn onClick={prev} title="上一步">
+        <IconBtn onClick={prev} title="上一步" isPhone={isPhone}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polygon points="19 20 9 12 19 4 19 20"/>
           </svg>
         </IconBtn>
 
         {playing ? (
-          <button onClick={stop} style={primaryBtn('#f87171', 'rgba(248,113,113,0.2)')}>
+          <button onClick={stop} style={primaryBtn('#f87171', 'rgba(248,113,113,0.2)', isPhone)}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
             </svg>
             暂停
           </button>
         ) : (
-          <button onClick={play} style={primaryBtn('var(--accent)', 'var(--accent-soft)')}>
+          <button onClick={play} style={primaryBtn('var(--accent)', 'var(--accent-soft)', isPhone)}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
@@ -220,7 +224,7 @@ export default function StepController({
           </button>
         )}
 
-        <IconBtn onClick={goNext} title="下一步">
+        <IconBtn onClick={goNext} title="下一步" isPhone={isPhone}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polygon points="5 4 15 12 5 20 5 4"/>
           </svg>
@@ -277,10 +281,11 @@ export default function StepController({
   )
 }
 
-function IconBtn({ children, onClick, title }) {
+function IconBtn({ children, onClick, title, isPhone }) {
+  const size = isPhone ? 40 : 33
   return (
-    <button onClick={onClick} title={title} style={{
-      width: 33, height: 33,
+    <button onClick={onClick} title={title} aria-label={title} style={{
+      width: size, height: size,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'var(--glass-bg-mid)',
       backdropFilter: 'var(--glass-blur)',
@@ -290,6 +295,7 @@ function IconBtn({ children, onClick, title }) {
       border: '1px solid var(--glass-border)',
       boxShadow: 'var(--glass-shine)',
       transition: 'all 0.15s',
+      WebkitTapHighlightColor: 'transparent',
     }}
     onMouseEnter={e => {
       e.currentTarget.style.color = 'var(--text-primary)'
@@ -306,9 +312,10 @@ function IconBtn({ children, onClick, title }) {
   )
 }
 
-function primaryBtn(color, glow) {
+function primaryBtn(color, glow, isPhone) {
   return {
-    height: 33, padding: '0 16px',
+    height: isPhone ? 40 : 33,
+    padding: isPhone ? '0 18px' : '0 16px',
     display: 'flex', alignItems: 'center', gap: 6,
     background: `color-mix(in srgb, ${color} 18%, transparent)`,
     backdropFilter: 'var(--glass-blur)',
@@ -317,6 +324,8 @@ function primaryBtn(color, glow) {
     borderRadius: 'var(--r-sm)',
     boxShadow: `var(--glass-shine), 0 0 16px ${glow}`,
     color: color,
-    fontSize: 13, fontWeight: 700,
+    fontSize: isPhone ? 14 : 13,
+    fontWeight: 700,
+    WebkitTapHighlightColor: 'transparent',
   }
 }

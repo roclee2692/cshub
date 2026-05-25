@@ -4,6 +4,7 @@ import CodeBlock from './CodeBlock'
 import ResizableSplitPanel from './ResizableSplitPanel'
 import VariablePanel from './VariablePanel'
 import { useStepData } from '../../contexts/StepContext'
+import { useIsPhone } from '../../hooks/useMediaQuery'
 import { inferCodeLine } from './codeLineInference'
 
 const ALL_LANGS = [
@@ -24,9 +25,10 @@ export default function InteractiveVisualization({ playground, code, slug, showC
   const [stackedMode, setStackedMode] = useState(false)
   const [isNarrow, setIsNarrow] = useState(false)
   const stepData = useStepData()
+  const isPhone = useIsPhone()
   const outletContext = useOutletContext() || {}
   const sidebarCollapsed = outletContext.sidebarCollapsed || false
-  
+
   // 检测屏幕宽度，当侧栏折叠时调整阈值
   useEffect(() => {
     const checkWidth = () => {
@@ -69,37 +71,63 @@ export default function InteractiveVisualization({ playground, code, slug, showC
       flexWrap: 'wrap',
       marginBottom: 12,
     }}>
-      <div style={{
-        display: 'flex',
-        gap: 2,
-        padding: 4,
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 8,
-        width: 'fit-content',
-      }}>
-        {LANGS.map(l => {
-          const active = lang === l.key
-          return (
-            <button key={l.key} onClick={() => setLang(l.key)}
-              style={{
-                padding: '6px 18px',
-                fontSize: 12.5,
-                fontWeight: 600,
-                borderRadius: 5,
-                border: 'none',
-                background: active ? 'var(--bg)' : 'transparent',
-                color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontFamily: 'var(--font-mono)',
-                boxShadow: active ? 'var(--shadow-sm)' : 'none',
-                transition: 'all 0.15s',
-                cursor: 'pointer',
-              }}>
-              {l.label}
-            </button>
-          )
-        })}
-      </div>
+      {isPhone ? (
+        // 手机端：用原生 select 节省横向空间（3 个 tab 约 240px，太宽）
+        <select
+          value={lang}
+          onChange={e => setLang(e.target.value)}
+          style={{
+            padding: '7px 12px',
+            fontSize: 12.5,
+            fontWeight: 600,
+            borderRadius: 6,
+            border: '1px solid var(--border)',
+            background: 'var(--surface)',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-mono)',
+            cursor: 'pointer',
+            minHeight: 36,
+          }}
+          aria-label="选择代码语言"
+        >
+          {LANGS.map(l => (
+            <option key={l.key} value={l.key}>{l.label}</option>
+          ))}
+        </select>
+      ) : (
+        // 桌面 / iPad：tab 按钮组
+        <div style={{
+          display: 'flex',
+          gap: 2,
+          padding: 4,
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 8,
+          width: 'fit-content',
+        }}>
+          {LANGS.map(l => {
+            const active = lang === l.key
+            return (
+              <button key={l.key} onClick={() => setLang(l.key)}
+                style={{
+                  padding: '6px 18px',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  borderRadius: 5,
+                  border: 'none',
+                  background: active ? 'var(--bg)' : 'transparent',
+                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  fontFamily: 'var(--font-mono)',
+                  boxShadow: active ? 'var(--shadow-sm)' : 'none',
+                  transition: 'all 0.15s',
+                  cursor: 'pointer',
+                }}>
+                {l.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
       
       {/* 布局切换按钮 */}
       {!isNarrow && !forceStacked && showCode && (

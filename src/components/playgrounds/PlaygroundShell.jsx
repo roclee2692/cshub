@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import StepController, { useStepController } from '../StepController'
 import { Toolbar, ToolbarBtn, Legend } from './shared'
+import { useIsPhone } from '../../hooks/useMediaQuery'
 
 // ─────────────────────────────────────────────────────────────
 // PlaygroundShell · 模板方法（Template Method）
@@ -49,6 +50,7 @@ export default function PlaygroundShell({
   const firstId = initialPresetId || presets[0]?.id
   const [presetId, setPresetId] = useState(firstId)
   const activePreset = presets.find(p => p.id === presetId) || presets[0]
+  const isPhone = useIsPhone()
 
   const payload = stateful
     ? (derivePayload ? derivePayload(state) : state)
@@ -90,11 +92,20 @@ export default function PlaygroundShell({
             </ToolbarBtn>
           ))}
           {renderedExtraToolbar && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: isPhone ? 4 : 6,
+              flexWrap: 'wrap',
+              // 手机端整组占满工具栏一行，避免和 preset 按钮挤在一起破版
+              flex: isPhone ? '1 1 100%' : '0 1 auto',
+              minWidth: 0,
+            }}>
               {renderedExtraToolbar}
             </div>
           )}
-          <div style={{ flex: 1 }} />
+          {/* 桌面端用 spacer 把 toolbarRight 推到最右；手机端 toolbarRight 跟着换行靠左对齐 */}
+          {!isPhone && <div style={{ flex: 1 }} />}
           {toolbarRight}
         </Toolbar>
       )}

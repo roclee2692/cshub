@@ -107,10 +107,15 @@ export const VIZ_TO_NAME = {
   bplustree: 'BPlusTree',
   txnIsolation: 'Transaction',
   hashJoin: 'HashJoin',
+  mvcc: 'Mvcc',
+  queryPlan: 'QueryPlan',
   // 编译原理
   regexNfa: 'RegexNfa',
   nfaToDfa: 'NfaToDfa',
   buildAst: 'Ast',
+  ll1: 'LL1',
+  lr0: 'LR0',
+  codeGen: 'CodeGen',
 }
 
 export const PLAYGROUND_LOADERS = Object.fromEntries(
