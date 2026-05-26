@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Legend } from './shared'
 
 const STATE_COLOR = {
@@ -35,16 +36,9 @@ export default function PhilosophersPlayground({ algoFn }) {
 
   return (
     <div>
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        marginBottom: 16,
-        padding: '24px 20px',
-        minHeight: 460,
-      }}>
+      <VizCard borderRadius={10} padding="24px 20px" minHeight={460} noInner overflowX="hidden">
         <PhilosophersViz step={current} />
-      </div>
+      </VizCard>
 
       <Legend items={LEGEND} />
 

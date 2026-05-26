@@ -1,4 +1,5 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { StringField } from './inputs/NumberInput'
 
 const EX1_ITEMS = [{ weight: 2, value: 6 }, { weight: 2, value: 10 }, { weight: 3, value: 12 }]
@@ -75,14 +76,7 @@ function KnapsackPanel({ current, items, capacity }) {
       </div>
 
       {dp && (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          padding: 16,
-          marginBottom: 16,
-          overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding={16} noInner>
           <table style={{ borderCollapse: 'collapse', fontSize: 13, fontFamily: 'var(--font-mono)', margin: '0 auto' }}>
             <thead>
               <tr>
@@ -114,7 +108,7 @@ function KnapsackPanel({ current, items, capacity }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </VizCard>
       )}
     </>
   )

@@ -1,5 +1,6 @@
 import LISViz from '../LISViz'
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { randomArray, ArrayTextInput } from './inputs/ArrayInput'
 
 const CLASSIC = [1, 3, 5, 7, 9, 2, 4, 6, 8]
@@ -23,16 +24,9 @@ export default function LISPlayground({ algoFn }) {
           placeholder="自定义：10 9 2 5 3 7 101 18" />
       )}
       renderViz={({ current }) => (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          marginBottom: 16,
-          padding: '20px 12px',
-          overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding="20px 12px" noInner>
           <LISViz stepData={current} />
-        </div>
+        </VizCard>
       )}
     />
   )

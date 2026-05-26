@@ -94,7 +94,6 @@ export default function PersonalGrowthPage() {
         <span className="gp-deco gp-deco-heart1">♥</span>
         <span className="gp-deco gp-deco-heart2">♡</span>
         <span className="gp-deco gp-deco-crown">♛</span>
-        <span className="gp-deco gp-deco-curl">↩</span>
 
         {/* 左侧气泡 */}
         <div className="gp-bubble gp-bubble-left">
@@ -112,29 +111,68 @@ export default function PersonalGrowthPage() {
         </div>
 
         <div className="gp-hero-inner">
-          <div className="gp-kicker">PERSONAL GROWTH / EXPLORATION</div>
           <h1 className="gp-title">
             <span className="gp-title-highlight">内心充盈者，</span>
             独行也如众
           </h1>
-          {/* 手绘下划线 */}
+          {/* 手绘下划线（自己画出来） */}
           <div className="gp-underline-wrap" aria-hidden="true">
             <svg viewBox="0 0 600 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="gp-underline-svg">
-              <path d="M10 12 Q150 4 300 12 Q450 20 590 12" stroke="#f5a5a5" strokeWidth="6" strokeLinecap="round"/>
+              <path d="M10 12 Q150 4 300 12 Q450 20 590 12" pathLength="100" stroke="#f5a5a5" strokeWidth="6" strokeLinecap="round" className="gp-underline-path"/>
             </svg>
             <svg viewBox="0 0 300 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="gp-underline-svg2">
-              <path d="M10 10 Q75 16 150 8 Q225 2 290 12" stroke="#ffc7a0" strokeWidth="5" strokeLinecap="round"/>
+              <path d="M10 10 Q75 16 150 8 Q225 2 290 12" pathLength="100" stroke="#ffc7a0" strokeWidth="5" strokeLinecap="round" className="gp-underline-path gp-underline-path-2"/>
             </svg>
             <span className="gp-heart-deco">♥</span>
           </div>
+
+          {/* 副标语 */}
+          <p className="gp-lead">
+            音乐 · 游戏 · 天赋 · 独立 · 记录<br/>
+            <span>给生活找几个能让灵魂呼吸的出口。</span>
+          </p>
+
+          {/* 章节快捷锚点 */}
+          <nav className="gp-chapters" aria-label="章节快捷导航">
+            <a href="#chapter-music" className="gp-chapter gp-chapter-red">
+              <span className="gp-chapter-num">01</span>
+              <span className="gp-chapter-label">乐器</span>
+            </a>
+            <a href="#chapter-games" className="gp-chapter gp-chapter-teal">
+              <span className="gp-chapter-num">02</span>
+              <span className="gp-chapter-label">游戏</span>
+            </a>
+            <a href="#chapter-talent" className="gp-chapter gp-chapter-gold">
+              <span className="gp-chapter-num">03</span>
+              <span className="gp-chapter-label">天赋</span>
+            </a>
+            <a href="#chapter-survival" className="gp-chapter gp-chapter-blue">
+              <span className="gp-chapter-num">04</span>
+              <span className="gp-chapter-label">独立</span>
+            </a>
+            <a href="#chapter-more" className="gp-chapter gp-chapter-purple">
+              <span className="gp-chapter-num">05</span>
+              <span className="gp-chapter-label">更多</span>
+            </a>
+          </nav>
+
         </div>
+
+        {/* 滚动提示（独立于 .gp-hero-inner，绝对定位贴底，与 Logic/Finance 一致） */}
+        <a href="#chapter-music" className="gp-scroll-hint" aria-label="Scroll">
+          <span>Scroll</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </a>
       </header>
 
       {/* ── 内容区 ── */}
       <main className="gp-main">
 
         {/* 01 Music */}
-        <section className="gp-section">
+        <section className="gp-section" id="chapter-music">
           <div className="gp-section-header">
             <span className="gp-tag">01 / MUSIC</span>
             <div>
@@ -162,7 +200,7 @@ export default function PersonalGrowthPage() {
         </section>
 
         {/* 02 Games */}
-        <section className="gp-section">
+        <section className="gp-section" id="chapter-games">
           <div className="gp-section-header">
             <span className="gp-tag gp-tag-teal">02 / GAMES</span>
             <div>
@@ -188,7 +226,7 @@ export default function PersonalGrowthPage() {
         </section>
 
         {/* 03 Talent */}
-        <section className="gp-section">
+        <section className="gp-section" id="chapter-talent">
           <div className="gp-section-header">
             <span className="gp-tag gp-tag-gold">03 / TALENT</span>
             <div>
@@ -208,7 +246,7 @@ export default function PersonalGrowthPage() {
         </section>
 
         {/* 04 Survival */}
-        <section className="gp-section">
+        <section className="gp-section" id="chapter-survival">
           <div className="gp-section-header">
             <span className="gp-tag gp-tag-blue">04 / SURVIVAL</span>
             <div>
@@ -228,7 +266,7 @@ export default function PersonalGrowthPage() {
         </section>
 
         {/* 05 More */}
-        <section className="gp-section">
+        <section className="gp-section" id="chapter-more">
           <div className="gp-section-header">
             <span className="gp-tag gp-tag-purple">05 / MORE</span>
             <div>

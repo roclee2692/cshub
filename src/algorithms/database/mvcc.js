@@ -12,10 +12,6 @@
 //   description: string,
 // }
 
-function cloneVersions(vs) {
-  return vs.map(v => ({ ...v }))
-}
-
 function cloneTxns(txns) {
   return txns.map(t => ({ ...t, snapshot: t.snapshot ? [...t.snapshot] : [] }))
 }
@@ -52,9 +48,8 @@ export function mvccDemo(scenario) {
 
   function push(activeTxn, phase, description, highlightRowIds = []) {
     // 找当前活动的读事务（非 committed/aborted）用来计算可见性
-    // activeTxn 可能是字符串 '1'，而 t.id 是数字，用 == 宽松比较
-    // eslint-disable-next-line eqeqeq
-    const activeReader = txns.find(t => t.status === 'active' && t.id == activeTxn)
+    // activeTxn 可能是字符串 '1'，而 t.id 是数字，用字符串化统一比较
+    const activeReader = txns.find(t => t.status === 'active' && String(t.id) === String(activeTxn))
     const visVersions = computeVisible(versions, activeReader, txns)
     steps.push({
       versions: visVersions,

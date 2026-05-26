@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn, TextInput } from './shared'
 
 const PRESETS = {
@@ -162,7 +163,7 @@ export default function SegTreePlayground({ algoFn }) {
       </div>
 
       {/* Tree SVG */}
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflowX: 'auto' }}>
+      <VizCard borderRadius={10} padding={0} noInner>
         <svg width={Math.max(maxX + 10, 400)} height={maxY} style={{ display: 'block' }}>
           {edges.map((e, i) => {
             const a = positions[e.from], b = positions[e.to]
@@ -196,7 +197,7 @@ export default function SegTreePlayground({ algoFn }) {
             )
           })}
         </svg>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length} step={ctrl.step} playing={ctrl.playing}
         speed={ctrl.speed} setSpeed={ctrl.setSpeed}

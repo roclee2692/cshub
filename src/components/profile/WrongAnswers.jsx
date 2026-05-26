@@ -1,26 +1,23 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ALGORITHMS } from '../../data/algorithmMeta'
+import { storageGet, storageSet } from '../../hooks/useLocalStorage'
+import { hoverHandlers } from '../../utils/hoverStyle'
 
 export const WRONG_Q_KEY = 'algoviz-wrong-questions'
 
 export function loadWrongQuestions() {
-  try {
-    const raw = localStorage.getItem(WRONG_Q_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch { return {} }
+  return storageGet(WRONG_Q_KEY, {})
 }
 
 export function saveWrongForSlug(slug, wrongIndices) {
-  try {
-    const current = loadWrongQuestions()
-    if (wrongIndices.length === 0) {
-      delete current[slug]
-    } else {
-      current[slug] = wrongIndices
-    }
-    localStorage.setItem(WRONG_Q_KEY, JSON.stringify(current))
-  } catch { /* ignore */ }
+  const current = loadWrongQuestions()
+  if (wrongIndices.length === 0) {
+    delete current[slug]
+  } else {
+    current[slug] = wrongIndices
+  }
+  storageSet(WRONG_Q_KEY, current)
 }
 
 export default function WrongAnswers({ quizScores }) {
@@ -66,14 +63,10 @@ export default function WrongAnswers({ quizScores }) {
               display: 'flex', alignItems: 'center', gap: 14,
               transition: 'all 0.15s',
             }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--red)'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
+              {...hoverHandlers(
+                { borderColor: 'var(--red)', transform: 'translateY(-1px)' },
+                { borderColor: 'var(--border)', transform: 'translateY(0)' },
+              )}
             >
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,

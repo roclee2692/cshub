@@ -655,6 +655,7 @@
   --finance-panel: rgba(246, 238, 207, 0.075);
   --finance-panel-strong: rgba(246, 238, 207, 0.12);
   --finance-gold: #d7b56d;
+  --finance-scroll: #8fcf8a;
   --finance-cream: #f7efd8;
   --finance-muted: rgba(247, 239, 216, 0.68);
   --finance-faint: rgba(247, 239, 216, 0.42);
@@ -737,13 +738,13 @@
   padding: 6px 10px;
   background: transparent;
   border: 0;
-  color: rgba(215, 181, 109, 0.72);
+  color: color-mix(in srgb, var(--finance-scroll) 78%, transparent);
   cursor: pointer;
   transition: color 0.18s;
   animation: financeChevronFade 0.9s ease 0.6s both, financeChevronBob 1.8s ease-in-out 1.5s infinite;
 }
 
-.finance-hero-chevron:hover { color: var(--finance-gold); }
+.finance-hero-chevron:hover { color: var(--finance-scroll); }
 
 .finance-hero-chevron-label {
   font-family: var(--font-mono);
@@ -2265,10 +2266,10 @@
   /* Liquid-glass Dynamic Island TopBar · 极淡背景 + 重度 backdrop-blur，
      让它无论叠在哪个页面（首页渐变 / 算法库 / 理财 / 逻辑学）都靠模糊穿透融合 */
   --island-bg: rgba(20, 20, 32, 0.16);
-  --island-border: rgba(255, 255, 255, 0.05);
-  --island-highlight-top: rgba(255, 255, 255, 0.08);
-  --island-highlight-bottom: rgba(255, 255, 255, 0.02);
-  --island-shadow-outer: 0 10px 26px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12);
+  --island-border: rgba(255, 255, 255, 0.14);
+  --island-highlight-top: rgba(255, 255, 255, 0.18);
+  --island-highlight-bottom: rgba(255, 255, 255, 0.06);
+  --island-shadow-outer: 0 12px 30px rgba(0, 0, 0, 0.34), 0 2px 8px rgba(0, 0, 0, 0.18);
 
   /* ── Glass tokens ── */
   --glass-bg:            rgba(255, 255, 255, 0.055);
@@ -2869,11 +2870,16 @@ input:focus, textarea:focus {
 .gp-hero {
   position: relative;
   z-index: 1;
-  padding: clamp(60px, 8vw, 100px) 48px clamp(48px, 6vw, 80px);
+  padding: clamp(48px, 6vw, 80px) 48px clamp(48px, 6vw, 80px);
   display: flex;
   justify-content: center;
-  min-height: min(460px, 55vh);
   align-items: center;
+  /* 用 dvh 而非 vh：精确等于"可见视口"高度，移动浏览器收起 UI 时也准。
+     用 height（而非 min-height）：hero 严格等于一屏，scroll 提示锚到 bottom 才会真在视口底。
+     min-height 兜底极矮窗口避免内容被切。 */
+  height: 100dvh;
+  min-height: 600px;
+  box-sizing: border-box;
 }
 
 .gp-hero-inner {
@@ -2924,12 +2930,173 @@ input:focus, textarea:focus {
 .gp-heart-deco {
   color: #e86c5d;
   font-size: 24px;
-  animation: gp-beat 1.6s ease-in-out infinite;
+  opacity: 0;
+  animation:
+    gp-heart-in 0.35s ease-out 1.0s forwards,
+    gp-beat 1.6s ease-in-out 1.4s infinite;
 }
 
 @keyframes gp-beat {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.25); }
+}
+@keyframes gp-heart-in {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* ── Signature: hand-drawn underline draws itself ── */
+.gp-underline-path {
+  fill: none;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: gp-draw 0.85s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+}
+.gp-underline-path-2 {
+  animation-delay: 0.6s;
+  animation-duration: 0.7s;
+}
+@keyframes gp-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Hero lead / sub-manifesto ── */
+.gp-lead {
+  margin: 28px auto 0;
+  max-width: 640px;
+  font-size: clamp(15px, 1.7vw, 19px);
+  line-height: 1.85;
+  color: #8b6a6a;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  animation: gp-rise-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
+}
+.gp-lead span {
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #a98787;
+  font-family: 'Ma Shan Zheng', 'Nunito', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-size: clamp(16px, 1.9vw, 22px);
+}
+
+/* ── Hero chapter pills ── */
+.gp-chapters {
+  margin: 28px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 720px;
+}
+.gp-chapter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px 9px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 3px 3px 0 rgba(200, 80, 80, 0.12);
+  color: #6d4a4a;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease,
+              background 0.25s ease;
+  opacity: 0;
+  transform: scale(0.55) translateY(14px);
+  animation: gp-pill-pop 0.45s cubic-bezier(0.34, 1.7, 0.5, 1) forwards;
+}
+.gp-chapter:nth-child(1) { animation-delay: 1.45s; }
+.gp-chapter:nth-child(2) { animation-delay: 1.54s; }
+.gp-chapter:nth-child(3) { animation-delay: 1.63s; }
+.gp-chapter:nth-child(4) { animation-delay: 1.72s; }
+.gp-chapter:nth-child(5) { animation-delay: 1.81s; }
+@keyframes gp-pill-pop {
+  0%   { opacity: 0; transform: scale(0.55) translateY(14px) rotate(-4deg); }
+  60%  { opacity: 1; transform: scale(1.08) translateY(-2px) rotate(1.5deg); }
+  100% { opacity: 1; transform: scale(1)    translateY(0)    rotate(0deg);   }
+}
+.gp-chapter:hover {
+  transform: translateY(-3px);
+  background: #fff;
+  box-shadow: 4px 6px 0 rgba(200, 80, 80, 0.18);
+}
+.gp-chapter-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e87c7c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.gp-chapter-label {
+  font-family: 'ZCOOL KuaiLe', 'Nunito', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+.gp-chapter-red    .gp-chapter-num { background: #e87c7c; }
+.gp-chapter-teal   .gp-chapter-num { background: #5bbfbf; }
+.gp-chapter-gold   .gp-chapter-num { background: #d4a442; }
+.gp-chapter-blue   .gp-chapter-num { background: #6b8ed6; }
+.gp-chapter-purple .gp-chapter-num { background: #b07ec8; }
+.gp-chapter-red    { box-shadow: 3px 3px 0 rgba(200, 80, 80, 0.16); }
+.gp-chapter-teal   { box-shadow: 3px 3px 0 rgba(60, 160, 160, 0.18); }
+.gp-chapter-gold   { box-shadow: 3px 3px 0 rgba(170, 120, 35, 0.18); }
+.gp-chapter-blue   { box-shadow: 3px 3px 0 rgba(70, 105, 180, 0.18); }
+.gp-chapter-purple { box-shadow: 3px 3px 0 rgba(130, 80, 180, 0.18); }
+
+/* ── Hero scroll hint：与 Logic / Finance 完全一致（位置 / 字体 / 字号 / 字重 / 字距），仅颜色随页面主题 ── */
+.gp-scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(28px, 4vh, 52px);
+  z-index: 3;
+  transform: translateX(-50%);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 0;
+  color: #c08080;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  animation:
+    gp-scroll-fade 0.55s ease 2.25s forwards,
+    gp-scroll-bob  1.8s ease-in-out 2.8s infinite;
+  transition: color 0.18s;
+}
+.gp-scroll-hint:hover { color: #e86c5d; }
+@keyframes gp-scroll-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes gp-scroll-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 5px); }
+}
+@keyframes gp-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 /* ── Floating decorations ── */
@@ -2959,6 +3126,15 @@ input:focus, textarea:focus {
   position: absolute;
   z-index: 2;
   pointer-events: none;
+  opacity: 0;
+  transform: scale(0.4) rotate(-12deg);
+  transform-origin: 80% 100%;
+  animation: gp-bubble-pop 0.55s cubic-bezier(0.34, 1.65, 0.5, 1) 1.9s forwards;
+}
+@keyframes gp-bubble-pop {
+  0%   { opacity: 0; transform: scale(0.4) rotate(-12deg); }
+  60%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1)    rotate(0deg); }
 }
 .gp-bubble-left {
   left: 4%;
@@ -3002,6 +3178,15 @@ input:focus, textarea:focus {
   pointer-events: none;
   width: clamp(90px, 10vw, 120px);
   font-family: 'Liu Jian Mao Cao', 'PingFang SC', 'Microsoft YaHei', cursive;
+  opacity: 0;
+  transform-origin: 50% -10%;
+  animation: gp-sticky-drop 0.6s cubic-bezier(0.34, 1.55, 0.5, 1) 2.05s forwards;
+}
+@keyframes gp-sticky-drop {
+  0%   { opacity: 0; transform: rotate(-14deg) translateY(-30px) scale(0.85); }
+  55%  { opacity: 1; transform: rotate(6deg)   translateY(4px)   scale(1.02); }
+  80%  {             transform: rotate(0deg)   translateY(-2px); }
+  100% { opacity: 1; transform: rotate(2deg)   translateY(0)     scale(1);    }
 }
 .gp-sticky::before {
   content: '';
@@ -3310,6 +3495,29 @@ input:focus, textarea:focus {
   color: #ffa6a6;
 }
 
+[data-theme="dark"] .gp-lead {
+  color: #d6b8b8;
+}
+[data-theme="dark"] .gp-lead span {
+  color: #b89898;
+}
+
+[data-theme="dark"] .gp-chapter {
+  background: rgba(40, 30, 30, 0.55);
+  border-color: rgba(255, 200, 200, 0.12);
+  color: #f0d8d8;
+}
+[data-theme="dark"] .gp-chapter:hover {
+  background: rgba(50, 36, 36, 0.78);
+}
+
+[data-theme="dark"] .gp-scroll-hint {
+  color: #d8a8a8;
+}
+[data-theme="dark"] .gp-scroll-hint:hover {
+  color: #ffa6a6;
+}
+
 [data-theme="dark"] .gp-bubble path {
   fill: var(--bg-secondary) !important;
   stroke: rgba(232, 124, 124, 0.4);
@@ -3553,12 +3761,30 @@ input:focus, textarea:focus {
   .guide-section p { font-size: 13.5px !important; }
   .guide-section pre { font-size: 11px !important; padding: 12px !important; }
 
-  .topbar { padding: 0 14px !important; gap: 10px !important; }
+  .topbar {
+    top: 10px !important;
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    height: 52px !important;
+    padding: 0 10px 0 12px !important;
+    gap: 8px !important;
+    border-radius: 22px !important;
+  }
+  .topbar-brand-text {
+    display: inline !important;
+    font-size: 15px !important;
+  }
   .topbar-nav { display: none !important; }
   /* 当 nav 被隐藏时，logo 和右侧区块之间的 IslandDivider 也不需要显示 */
   .topbar-nav-divider { display: none !important; }
   .topbar-github { display: none !important; }
-  .topbar-search { width: 38px !important; padding: 6px 10px !important; }
+  .topbar-search {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
   .topbar-search-label { display: none !important; }
   .topbar-search-kbd { display: none !important; }
 
@@ -3600,6 +3826,7 @@ input:focus, textarea:focus {
   /* 深色模式：几乎不透明的深色玻璃 */
   .mobile-bottom-nav {
     --mobile-nav-bg: rgba(10, 10, 22, 0.90);
+    color: var(--text-secondary);
   }
   /* Tab 点击高亮（替换浏览器默认的蓝色） */
   .mobile-bottom-tab:active {
@@ -4691,7 +4918,15 @@ input:focus, textarea:focus {
   .topbar-github span  { display: none !important; }
 
   /* 顶部岛内部 padding 收紧 */
-  .topbar              { padding: 0 10px 0 14px !important; gap: 10px !important; }
+  .topbar {
+    top: 12px !important;
+    width: min(1240px, calc(100% - 32px)) !important;
+    max-width: calc(100% - 32px) !important;
+    height: 60px !important;
+    padding: 0 10px 0 14px !important;
+    gap: 10px !important;
+    border-radius: 999px !important;
+  }
 
   /* Sidebar：恢复内嵌而非抽屉，宽度收 224 */
   .sidebar {
@@ -5133,6 +5368,7 @@ input:focus, textarea:focus {
   --finance-panel:        rgba(160, 120, 40, 0.07);
   --finance-panel-strong: rgba(150, 110, 30, 0.11);
   --finance-gold:         #9a7030;
+  --finance-scroll:       #4c9769;
   --finance-cream:        #1a1208;
   --finance-muted:        rgba(26, 18, 8, 0.62);
   --finance-faint:        rgba(26, 18, 8, 0.36);

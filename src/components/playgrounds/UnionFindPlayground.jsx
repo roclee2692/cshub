@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 
 const PRESETS = [
   {
@@ -76,7 +77,7 @@ function UnionFindViz({ current, n }) {
   }
 
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflow: 'hidden' }}>
+    <VizCard borderRadius={10} padding={0} noInner>
       <svg width="100%" viewBox={`0 0 600 ${svgH}`} style={{ display: 'block', minHeight: 140 }}>
         {pos.filter(Boolean).map((p, i) => {
           const par = current.parent[i]
@@ -128,7 +129,7 @@ function UnionFindViz({ current, n }) {
           </span>
         ))}
       </div>
-    </div>
+    </VizCard>
   )
 }
 

@@ -95,15 +95,18 @@ export default function MobileBottomNav() {
 
             <span
               style={{
-                fontSize: 19,
-                lineHeight: 1,
+                width: 24,
+                height: 24,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 position: 'relative',
                 transition: 'transform 0.18s ease',
-                transform: active ? 'scale(1.08)' : 'scale(1)',
+                transform: active ? 'translateY(-1px)' : 'translateY(0)',
               }}
               aria-hidden
             >
-              {tab.icon}
+              <TabIcon id={tab.id} />
             </span>
             <span
               style={{
@@ -123,4 +126,75 @@ export default function MobileBottomNav() {
       })}
     </nav>
   )
+}
+
+function TabIcon({ id }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+  }
+
+  switch (id) {
+    case 'home':
+      return (
+        <svg {...common}>
+          <path d="M3 10.5 12 3l9 7.5" />
+          <path d="M5.5 9.5V21h13V9.5" />
+          <path d="M9.5 21v-6h5v6" />
+        </svg>
+      )
+    case 'learn':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8" />
+          <path d="m14.7 9.3-1.9 5.5-5.5 1.9 1.9-5.5 5.5-1.9Z" />
+          <path d="M12 12h.01" />
+        </svg>
+      )
+    case 'algo':
+      return (
+        <svg {...common}>
+          <path d="M5 20V10" />
+          <path d="M12 20V4" />
+          <path d="M19 20v-7" />
+          <path d="M3 20h18" />
+        </svg>
+      )
+    case 'logic':
+      return (
+        <svg {...common}>
+          <path d="M9 18h6" />
+          <path d="M10 22h4" />
+          <path d="M8.5 14.5A6 6 0 1 1 15.5 14c-.9.6-1.5 1.7-1.5 3h-4c0-1.1-.5-2-1.5-2.5Z" />
+          <path d="M12 7v5l3 1.5" />
+        </svg>
+      )
+    case 'finance':
+      return (
+        <svg {...common}>
+          <path d="M12 2v20" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      )
+    case 'growth':
+      return (
+        <svg {...common}>
+          <path d="M12 21V11" />
+          <path d="M12 11c0-4 2.5-7 7-8 0 5-3 8-7 8Z" />
+          <path d="M12 15c0-3.5-2.5-6-7-7 0 4.5 3 7 7 7Z" />
+        </svg>
+      )
+    default:
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+      )
+  }
 }

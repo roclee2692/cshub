@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState, useCallback } from 'react'
+import { lazy, Suspense, useEffect, useState, useCallback, memo } from 'react'
 import { Prose } from './Section'
 import CodeBlock from './CodeBlock'
 import ComplexityCards from './ComplexityCards'
@@ -31,7 +31,8 @@ function readHashTab() {
   return TAB_DEFS[0].id
 }
 
-export default function AlgorithmTabs({ algo }) {
+// memo：algo 引用稳定（slug 不变时不重建）；主题切换不需要重渲染 Tab 区域
+const AlgorithmTabs = memo(function AlgorithmTabs({ algo }) {
   const [active, setActive] = useState(readHashTab)
   const hasQuiz = !!QUIZZES[algo.slug]
 
@@ -164,7 +165,9 @@ export default function AlgorithmTabs({ algo }) {
       </div>
     </section>
   )
-}
+})
+
+export default AlgorithmTabs
 
 function Panel({ id, title, children }) {
   return (

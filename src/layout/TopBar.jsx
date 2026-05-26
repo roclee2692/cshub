@@ -49,8 +49,12 @@ export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpe
 
       const navRect = nav.getBoundingClientRect()
       const linkRect = activeLink.getBoundingClientRect()
+      // Math.round 必要：translate3d 拿到小数 px（如 294.75）会触发亚像素抗锯齿，
+      // 3px 高的渐变条 + 12px 模糊投影在分像素位置上会把颜色不均地分到上下两行像素，
+      // 视觉上呈现为"线条歪斜"。整数位移可消除此错觉。
+      const rawLeft = linkRect.left - navRect.left + (linkRect.width - NAV_INDICATOR_WIDTH) / 2
       setNavIndicator({
-        left: linkRect.left - navRect.left + (linkRect.width - NAV_INDICATOR_WIDTH) / 2,
+        left: Math.round(rawLeft),
         ready: true,
       })
     }
@@ -92,15 +96,18 @@ export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpe
           style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0, whiteSpace: 'nowrap' }}
         >
           <Logo />
-          {!isPhone && (
-            <span style={{
+          <span
+            className="topbar-brand-text"
+            style={{
               fontWeight: 800,
               fontSize: 16,
-              letterSpacing: '-0.02em',
+              letterSpacing: 0,
               color: 'var(--text-primary)',
               whiteSpace: 'nowrap',
-            }}>CS Hub</span>
-          )}
+            }}
+          >
+            CS Hub
+          </span>
         </Link>
 
         {/* logo 和主导航之间的分隔线：手机端导航整组隐藏时，此分隔线也随之隐藏 */}

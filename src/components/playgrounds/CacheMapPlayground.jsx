@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Legend } from './shared'
 
 const LEGEND = [
@@ -17,17 +18,9 @@ export default function CacheMapPlayground({ algoFn }) {
 
   return (
     <div>
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        marginBottom: 16,
-        padding: '24px 20px',
-        overflowX: 'auto',
-        minHeight: 360,
-      }}>
+      <VizCard borderRadius={10} padding="24px 20px" minHeight={360} noInner>
         <CacheViz step={current} />
-      </div>
+      </VizCard>
 
       <Legend items={LEGEND} />
 

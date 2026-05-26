@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { CATEGORIES } from '../../data/algorithmMeta'
 import { useProgress } from '../../contexts/ProgressContext'
 import { useIsPhone } from '../../hooks/useMediaQuery'
@@ -17,62 +18,14 @@ const TEXT = {
   defaultDescription: '\u901a\u8fc7\u53ef\u89c6\u5316\u3001\u4f2a\u4ee3\u7801\u548c\u590d\u6742\u5ea6\u5206\u6790\u7406\u89e3\u8be5\u7b97\u6cd5\u3002',
 }
 
-const CATEGORY_META = {
-  sorting: { label: '\u6392\u5e8f\u7b97\u6cd5', color: '#8b5cf6', mark: 'SORT' },
-  graph: { label: '\u56fe\u7b97\u6cd5', color: '#3b82f6', mark: 'GRAPH' },
-  tree: { label: '\u6811\u7ed3\u6784', color: '#10b981', mark: 'TREE' },
-  dp: { label: '\u52a8\u6001\u89c4\u5212', color: '#f59e0b', mark: 'DP' },
-  backtracking: { label: '\u56de\u6eaf\u7b97\u6cd5', color: '#dc2626', mark: 'DFS' },
-  pageReplacement: { label: '\u9875\u9762\u7f6e\u6362', color: '#ec4899', mark: 'PAGE' },
-  diskScheduling: { label: '\u78c1\u76d8\u8c03\u5ea6', color: '#8b5cf6', mark: 'DISK' },
-  string: { label: '\u5b57\u7b26\u4e32\u5339\u914d', color: '#14b8a6', mark: 'STR' },
-  dataStructures: { label: '\u6570\u636e\u7ed3\u6784', color: '#6366f1', mark: 'DS' },
-}
-
-const ALGORITHM_TITLES = {
-  bubblesort: '\u5192\u6ce1\u6392\u5e8f',
-  selectionsort: '\u9009\u62e9\u6392\u5e8f',
-  shellsort: '\u5e0c\u5c14\u6392\u5e8f',
-  insertionsort: '\u63d2\u5165\u6392\u5e8f',
-  countingsort: '\u8ba1\u6570\u6392\u5e8f',
-  quicksort: '\u5feb\u901f\u6392\u5e8f',
-  mergesort: '\u5f52\u5e76\u6392\u5e8f',
-  heapsort: '\u5806\u6392\u5e8f',
-  radixsort: '\u57fa\u6570\u6392\u5e8f',
-  bucketsort: '\u6876\u6392\u5e8f',
-  bfs: '\u5e7f\u5ea6\u4f18\u5148\u641c\u7d22',
-  dfs: '\u6df1\u5ea6\u4f18\u5148\u641c\u7d22',
-  dijkstra: 'Dijkstra \u7b97\u6cd5',
-  bellmanford: 'Bellman-Ford \u7b97\u6cd5',
-  floydwarshall: 'Floyd-Warshall \u7b97\u6cd5',
-  toposort: '\u62d3\u6251\u6392\u5e8f',
-  prim: 'Prim \u6700\u5c0f\u751f\u6210\u6811',
-  kruskal: 'Kruskal \u6700\u5c0f\u751f\u6210\u6811',
-  bst: '\u4e8c\u53c9\u641c\u7d22\u6811',
-  redblack: '\u7ea2\u9ed1\u6811',
-  avl: 'AVL \u6811',
-  treap: 'Treap',
-  knapsack: '0-1 \u80cc\u5305',
-  lcs: '\u6700\u957f\u516c\u5171\u5b50\u5e8f\u5217',
-  lis: '\u6700\u957f\u9012\u589e\u5b50\u5e8f\u5217',
-  editdistance: '\u7f16\u8f91\u8ddd\u79bb',
-  coinchange: '\u786c\u5e01\u627e\u96f6',
-  fifo: 'FIFO \u9875\u9762\u7f6e\u6362',
-  lru: 'LRU \u9875\u9762\u7f6e\u6362',
-  opt: 'OPT \u9875\u9762\u7f6e\u6362',
-  diskfcfs: 'FCFS \u78c1\u76d8\u8c03\u5ea6',
-  sstf: 'SSTF \u78c1\u76d8\u8c03\u5ea6',
-  scan: 'SCAN \u78c1\u76d8\u8c03\u5ea6',
-  naive: '\u6734\u7d20\u5b57\u7b26\u4e32\u5339\u914d',
-  kmp: 'KMP \u5b57\u7b26\u4e32\u5339\u914d',
-  rabinkarp: 'Rabin-Karp \u5b57\u7b26\u4e32\u5339\u914d',
-  nqueens: 'N \u7687\u540e',
-  unionfind: '\u5e76\u67e5\u96c6',
-  trie: 'Trie \u5b57\u5178\u6811',
-  linkedlist: '\u94fe\u8868',
-  astar: 'A* \u641c\u7d22',
-  hashtable: '\u54c8\u5e0c\u8868',
-  segtree: '\u7ebf\u6bb5\u6811',
+// \u5404 category \u7684\u6c34\u5370\u7f29\u5199\uff08\u4ec5\u6b64\u5904\u9700\u8981\uff0c\u65e0\u6cd5\u4ece CATEGORIES \u6d3e\u751f\uff09
+const CATEGORY_MARK = {
+  sorting: 'SORT', graph: 'GRAPH', tree: 'TREE', dp: 'DP',
+  backtracking: 'DFS', pageReplacement: 'PAGE', diskScheduling: 'DISK',
+  string: 'STR', dataStructures: 'DS', network: 'NET', security: 'SEC',
+  co: 'CO', cpuScheduling: 'CPU', synchronization: 'SYNC',
+  memoryManagement: 'MEM', dbIndex: 'IDX', dbTxn: 'TXN', dbQuery: 'QRY',
+  compilerLex: 'LEX', compilerSyn: 'SYN', compilerCode: 'ASM',
 }
 
 function normalizeDifficulty(value) {
@@ -86,19 +39,23 @@ function normalizeDifficulty(value) {
   return { label: TEXT.basic, color: 'var(--green)' }
 }
 
-export default function AlgorithmHeader({ algo }) {
+// memo：algo 对象在加载后引用稳定，主题切换不应重渲染此组件
+// （视觉已由 CSS 变量处理，React 状态更新无需触发重渲染）
+const AlgorithmHeader = memo(function AlgorithmHeader({ algo }) {
   const cat = CATEGORIES[algo.category]
   const { isFavorite, isCompleted, toggleFavorite, toggleCompleted } = useProgress()
   const fav = isFavorite(algo.slug)
   const done = isCompleted(algo.slug)
   const isPhone = useIsPhone()
-  const meta = CATEGORY_META[algo.category] || {
-    label: cat?.name || '',
+  // 从 CATEGORIES（SSOT）读取 label/color，仅 mark 需要本地映射
+  const meta = {
+    label: cat?.name || algo.category,
     color: cat?.color || '#8b5cf6',
-    mark: 'ALGO',
+    mark: CATEGORY_MARK[algo.category] || algo.category.slice(0, 4).toUpperCase(),
   }
   const difficulty = normalizeDifficulty(algo.difficulty)
-  const title = ALGORITHM_TITLES[algo.slug] || algo.name || algo.nameEn || algo.slug
+  // 标题取自算法元数据（SSOT）：name > nameEn > slug
+  const title = algo.name || algo.nameEn || algo.slug
   const subtitle = algo.nameEn || algo.slug
 
   return (
@@ -223,7 +180,9 @@ export default function AlgorithmHeader({ algo }) {
       </div>
     </section>
   )
-}
+})
+
+export default AlgorithmHeader
 
 function GlassActionBtn({ active, onClick, children, activeColor, activeGlow }) {
   return (

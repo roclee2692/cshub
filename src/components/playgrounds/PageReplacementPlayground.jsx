@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import PageReplacementViz from '../PageReplacementViz'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn, TextInput, Legend } from './shared'
 
 function randomPages(n = 15, maxPage = 5) {
@@ -77,16 +78,9 @@ export default function PageReplacementPlayground({ algoFn }) {
           onSubmit={applyCustom} submitLabel="应用" />
       </Toolbar>
 
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        marginBottom: 16,
-        padding: '24px 16px',
-        overflowX: 'auto',
-      }}>
+      <VizCard borderRadius={10} padding="24px 16px" noInner>
         <PageReplacementViz stepData={current} steps={steps} />
-      </div>
+      </VizCard>
 
       <Legend items={LEGEND} />
 

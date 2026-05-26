@@ -58,10 +58,16 @@ export function AchievementsProvider({ children }) {
   const [subjectStats, setSubjectStats] = useState({})
   const [totalAlgorithms, setTotalAlgorithms] = useState(0)
   const skipNextEvalRef = useRef(true)
+  // 镜像当前 unlocked 到 ref，供 achievement 评估定时器同步读取，
+  // 避免把 unlocked 加入 effect deps（会造成无限循环）
+  const unlockedRef = useRef(unlocked)
 
   // 镜像到 localStorage
   useEffect(() => { saveStreak(streak) }, [streak])
-  useEffect(() => { saveAchSet(unlocked) }, [unlocked])
+  useEffect(() => {
+    unlockedRef.current = unlocked
+    saveAchSet(unlocked)
+  }, [unlocked])
 
   // ─── 拉云端 streak/achievements ──
   useEffect(() => {
@@ -140,6 +146,9 @@ export function AchievementsProvider({ children }) {
   }, [completed])
 
   // ─── 自动评徽章（初始立即评，后续 300ms debounce 合并连续变更）──
+  // 规则：state updater 函数必须是纯函数（React 并发模式可能多次调用）。
+  // 所有 side-effect（setNewlyUnlocked / Supabase upsert）放在 updater 外部，
+  // 通过 unlockedRef 同步读取当前值来计算 diff，避免把 unlocked 加入 deps。
   useEffect(() => {
     if (skipNextEvalRef.current) {
       skipNextEvalRef.current = false
@@ -154,27 +163,27 @@ export function AchievementsProvider({ children }) {
       const next = evaluateAchievements({
         completed, favorites, quizScores, streak, subjectStats, totalAlgorithms,
       })
-      setUnlocked(prev => {
-        const merged = new Set(prev)
-        const fresh = []
-        for (const id of next) {
-          if (!merged.has(id)) {
-            merged.add(id)
-            fresh.push(id)
-            if (hasSupabase && userId) {
-              getSupabase().then(client => client?.from('user_achievements').upsert({
-                  user_id: userId,
-                  achievement_id: id,
-                  unlocked_at: new Date().toISOString(),
-                }, { onConflict: 'user_id,achievement_id' }))
-            }
-          }
+
+      // 用 ref 同步读取当前已解锁集合，计算本次新增 —— 不在 updater 内部做
+      const fresh = [...next].filter(id => !unlockedRef.current.has(id))
+      if (fresh.length === 0) return
+
+      // 1. 更新解锁集合（pure updater，无 side effects）
+      setUnlocked(prev => new Set([...prev, ...fresh]))
+
+      // 2. 显示 toast（独立 setState，不嵌套在其他 updater 内）
+      setNewlyUnlocked(q => [...q, ...fresh.map(id => ACHIEVEMENTS[id]).filter(Boolean)])
+
+      // 3. 云端持久化（异步 side-effect，在 updater 外部执行）
+      if (hasSupabase && userId) {
+        for (const id of fresh) {
+          getSupabase().then(client => client?.from('user_achievements').upsert({
+            user_id: userId,
+            achievement_id: id,
+            unlocked_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,achievement_id' }))
         }
-        if (fresh.length > 0) {
-          setNewlyUnlocked(q => [...q, ...fresh.map(id => ACHIEVEMENTS[id]).filter(Boolean)])
-        }
-        return merged
-      })
+      }
     }, 300)
     return () => clearTimeout(timer)
   }, [completed, favorites, quizScores, streak, subjectStats, totalAlgorithms, userId])

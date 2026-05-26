@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn, TextInput } from './shared'
 
 const PRESETS = {
@@ -89,7 +90,7 @@ export default function HashTablePlayground({ algoFn }) {
         </span>
       </Toolbar>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflowX: 'auto' }}>
+      <VizCard borderRadius={10} padding={0} noInner>
         <svg width={svgW} height={svgH} style={{ display: 'block' }}>
           {/* Header */}
           <text x={10} y={16} fill="var(--text-tertiary)" fontSize={10} fontWeight={700}>桶</text>
@@ -179,7 +180,7 @@ export default function HashTablePlayground({ algoFn }) {
             </span>
           ))}
         </div>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length} step={ctrl.step} playing={ctrl.playing}
         speed={ctrl.speed} setSpeed={ctrl.setSpeed}

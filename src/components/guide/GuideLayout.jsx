@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
+import { storageGet, storageSet } from '../../hooks/useLocalStorage'
 
 /**
  * 通用章节式教程布局 - 全新重排版
@@ -19,7 +20,7 @@ export default function GuideLayout({ meta, sections }) {
 
   // Restore scroll position on mount
   useEffect(() => {
-    const saved = parseInt(localStorage.getItem(storageKey) || '0', 10)
+    const saved = storageGet(storageKey, 0)
     if (saved > 0 && sectionRefs.current[saved]) {
       setTimeout(() => {
         sectionRefs.current[saved]?.scrollIntoView({ block: 'start' })
@@ -47,9 +48,7 @@ export default function GuideLayout({ meta, sections }) {
 
   // Persist section index
   useEffect(() => {
-    try { localStorage.setItem(storageKey, String(activeSection)) } catch {
-      // Storage can be unavailable in restricted browser contexts.
-    }
+    storageSet(storageKey, activeSection)
   }, [activeSection, storageKey])
 
   function scrollToSection(idx) {

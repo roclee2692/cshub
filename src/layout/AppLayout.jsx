@@ -10,7 +10,7 @@ const GUIDE_PATHS = ['/learn', '/github', '/ai', '/finance', '/health', '/interv
 
 const GUIDE_BACK_PATHS = new Set(['/github', '/ai', '/interview', '/roadmap', '/toolbox', '/projects', '/setup'])
 
-function getFloatingBackTarget(pathname, search) {
+function getFloatingBackTarget(pathname) {
   if (pathname.startsWith('/path/')) return '/path'
   if (pathname.startsWith('/piano/lesson/') || pathname.startsWith('/piano/practice/') || pathname.startsWith('/piano/song/') || pathname === '/piano/legacy') return '/piano'
   if (pathname.startsWith('/guitar/lesson/')) return '/guitar'
@@ -26,12 +26,12 @@ function shouldOffsetFloatingBack(pathname, isPhone, sidebarCollapsed, isAlgo) {
 }
 
 export default function AppLayout() {
-  const { pathname, search } = useLocation()
+  const { pathname } = useLocation()
   const isHome = pathname === '/'
   const isAlgo = pathname.startsWith('/algo') || pathname.startsWith('/compare')
   const isGuide = GUIDE_PATHS.some(path => pathname.startsWith(path))
   const hasGuideSidebar = GUIDE_BACK_PATHS.has(pathname)
-  const floatingBackTarget = getFloatingBackTarget(pathname, search)
+  const floatingBackTarget = getFloatingBackTarget(pathname)
   // 三档断点：phone ≤640 / ipad 641-1024 / desktop >1024
   const viewport = useViewport()
   const isPhone = viewport === 'phone'
@@ -76,12 +76,14 @@ export default function AppLayout() {
 
       {/* TopBar 不再承载侧边栏切换——切换按钮改为贴在 Sidebar 右边缘的 rail tab，
           见下方 SidebarRailToggle。TopBar 只保留移动端的汉堡菜单。 */}
-      <TopBar
-        showMenuButton={showMenuButton}
-        onMenuClick={() => setSidebarOpen(o => !o)}
-        sidebarOpen={sidebarOpen}
-        sidebarCollapsed={sidebarCollapsed}
-      />
+      {!isPhone && (
+        <TopBar
+          showMenuButton={showMenuButton}
+          onMenuClick={() => setSidebarOpen(o => !o)}
+          sidebarOpen={sidebarOpen}
+          sidebarCollapsed={sidebarCollapsed}
+        />
+      )}
 
       {floatingBackTarget && (
         <Link

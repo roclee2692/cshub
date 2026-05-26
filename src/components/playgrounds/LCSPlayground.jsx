@@ -1,4 +1,5 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { StringField } from './inputs/NumberInput'
 
 const EXAMPLES = [
@@ -71,10 +72,7 @@ function LCSTable({ current, s1, s2 }) {
       )}
 
       {dp && (
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 10, padding: 16, marginBottom: 16, overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding={16} noInner>
           <table style={{ borderCollapse: 'collapse', fontSize: 13, fontFamily: 'var(--font-mono)', margin: '0 auto' }}>
             <thead>
               <tr>
@@ -118,7 +116,7 @@ function LCSTable({ current, s1, s2 }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </VizCard>
       )}
 
       <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap', fontSize: 11, color: 'var(--text-secondary)' }}>

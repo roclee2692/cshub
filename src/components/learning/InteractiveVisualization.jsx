@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import CodeBlock from './CodeBlock'
 import ResizableSplitPanel from './ResizableSplitPanel'
@@ -19,7 +19,10 @@ const ALL_LANGS = [
  * 在小屏幕上自动切换为单列布局
  * 当侧栏折叠时，自动调整并排显示的宽度
  */
-export default function InteractiveVisualization({ playground, code, slug, showCode = true, forceStacked = false }) {
+// memo：playground/code/slug 在算法加载后引用稳定；
+// 主题切换只更新 data-theme 属性，CSS 变量自动更新，无需 React 重渲染此组件。
+// playground prop 需由父级用 useMemo 稳定引用，才能让 memo 生效。
+const InteractiveVisualization = memo(function InteractiveVisualization({ playground, code, slug, showCode = true, forceStacked = false }) {
   const LANGS = code ? ALL_LANGS.filter(l => code[l.key]) : ALL_LANGS.slice(0, 2)
   const [lang, setLang] = useState('cpp')
   const [stackedMode, setStackedMode] = useState(false)
@@ -253,4 +256,6 @@ export default function InteractiveVisualization({ playground, code, slug, showC
       )}
     </>
   )
-}
+})
+
+export default InteractiveVisualization

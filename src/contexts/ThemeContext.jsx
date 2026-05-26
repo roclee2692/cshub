@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { flushSync } from 'react-dom'
+import { createContext, useContext, useEffect, useState, startTransition } from 'react'
 
 const ThemeContext   = createContext(null)
 const STORAGE_KEY    = 'algoviz-theme'
@@ -51,10 +50,14 @@ export function ThemeProvider({ children }) {
     root.setAttribute('data-vt', TRANSITION_STYLE)
 
     // ── 启动 View Transition ────────────────────────────────────
+    // CSS 变量变更 (data-theme) 在回调里同步完成，浏览器立即捕获"新"截图。
+    // setTheme 走 startTransition 推迟到动画结束后处理，避免在截图期间
+    // 同步重渲染整棵 React 树（SVG Playground + 大量 backdropFilter 元素）
+    // 导致主线程阻塞、动画启动延迟。
     const transition = document.startViewTransition(() => {
       root.setAttribute('data-theme', newTheme)
       localStorage.setItem(STORAGE_KEY, newTheme)
-      flushSync(() => setTheme(newTheme))
+      startTransition(() => setTheme(newTheme))
     })
 
     transition.finished

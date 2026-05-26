@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useStepPublish } from '../contexts/StepContext'
 import { useIsPhone } from '../hooks/useMediaQuery'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { useKeydown } from '../hooks/useKeydown'
 
 const SPEED_PRESETS = [
   { label: '0.5×', ms: 2000 },
@@ -13,17 +15,10 @@ const SPEED_PRESETS = [
 export function useStepController(steps) {
   const [step, setStep] = useState(0)
   const [playing, setPlaying] = useState(false)
-  const [speed, setSpeedState] = useState(() => {
-    try { const s = parseInt(localStorage.getItem('algoviz-speed'), 10); return (!isNaN(s) && s > 0) ? s : 1000 } catch { return 1000 }
-  })
+  // useLocalStorage 替代手写的 localStorage.getItem/setItem，并处理 SSR / 私密浏览降级。
+  // json: true（默认）确保读取时返回数字，向后兼容旧版存储的纯字符串 "1000"（JSON.parse 能识别）。
+  const [speed, setSpeed] = useLocalStorage('algoviz-speed', 1000)
   const timerRef = useRef(null)
-
-  function setSpeed(ms) {
-    setSpeedState(ms)
-    try { localStorage.setItem('algoviz-speed', String(ms)) } catch {
-      // Storage may be unavailable in private browsing or embedded contexts.
-    }
-  }
 
   // Publish step to StepContext so pseudocode section can read it
   useStepPublish(step, steps)
@@ -68,19 +63,13 @@ export default function StepController({
   const isDragging = useRef(false)
   const isPhone = useIsPhone()
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    function onKey(e) {
-      // Don't fire if user is typing in an input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
-      if (e.code === 'Space') { e.preventDefault(); playing ? stop() : play() }
-      else if (e.code === 'ArrowLeft') { e.preventDefault(); prev() }
-      else if (e.code === 'ArrowRight') { e.preventDefault(); goNext() }
-      else if (e.code === 'KeyR') { e.preventDefault(); reset() }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [playing, play, stop, prev, goNext, reset])
+  // Keyboard shortcuts — 由 useKeydown 自动处理 input 焦点过滤和清理
+  useKeydown({
+    Space:      (e) => { e.preventDefault(); playing ? stop() : play() },
+    ArrowLeft:  (e) => { e.preventDefault(); prev() },
+    ArrowRight: (e) => { e.preventDefault(); goNext() },
+    KeyR:       (e) => { e.preventDefault(); reset() },
+  })
 
   function posToStep(clientX) {
     const rect = scrubberRef.current.getBoundingClientRect()

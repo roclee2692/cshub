@@ -1,4 +1,5 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { ToolbarBtn, TextInput } from './shared'
 
 const LEGEND = [
@@ -73,16 +74,9 @@ export default function BinarySearchPlayground({ algoFn }) {
         )
       }}
       renderViz={({ current }) => (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          marginBottom: 16,
-          padding: '32px 20px 60px',
-          overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding="32px 20px 60px" noInner>
           <BinarySearchViz step={current} />
-        </div>
+        </VizCard>
       )}
       legend={LEGEND}
     />

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ALGORITHM_LIST, ALGORITHMS, CATEGORIES } from '../data/algorithmMeta'
 import { useProgress } from '../contexts/ProgressContext'
+import { storageGet, storageSet } from '../hooks/useLocalStorage'
 
 const SUBJECT_LIST = []
 const SUBJECT_ITEMS = SUBJECT_LIST.map(s => ({
@@ -18,20 +19,15 @@ const RECENT_KEY = 'algoviz-recent-search'
 const RECENT_MAX = 5
 
 function loadRecent() {
-  try {
-    const raw = localStorage.getItem(RECENT_KEY)
-    const arr = raw ? JSON.parse(raw) : []
-    return Array.isArray(arr) ? arr.slice(0, RECENT_MAX) : []
-  } catch { return [] }
+  const arr = storageGet(RECENT_KEY, [])
+  return Array.isArray(arr) ? arr.slice(0, RECENT_MAX) : []
 }
 
 function pushRecent(item) {
   if (!item) return
-  try {
-    const prev = loadRecent().filter(x => !(x.type === item.type && x.slug === item.slug))
-    const next = [{ type: item.type, slug: item.slug, name: item.name, to: item.to }, ...prev].slice(0, RECENT_MAX)
-    localStorage.setItem(RECENT_KEY, JSON.stringify(next))
-  } catch { /* ignore */ }
+  const prev = loadRecent().filter(x => !(x.type === item.type && x.slug === item.slug))
+  const next = [{ type: item.type, slug: item.slug, name: item.name, to: item.to }, ...prev].slice(0, RECENT_MAX)
+  storageSet(RECENT_KEY, next)
 }
 
 const GUIDE_ITEMS = [

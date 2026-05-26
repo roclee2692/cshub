@@ -1,43 +1,20 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ALGORITHMS } from '../../data/algorithmMeta'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 
 const FOLDERS_KEY = 'algoviz-folders'
 const UNGROUPED = '未分组'
 
-function loadFolders() {
-  try {
-    const raw = localStorage.getItem(FOLDERS_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch { return {} }
-}
-
-function saveFolders(folders) {
-  try { localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders)) } catch { /* ignore */ }
-}
-
 export default function FavoritesPanel({ favorites }) {
-  const [folders, setFolders]       = useState(() => loadFolders())
+  // useLocalStorage 在 setFolders 时自动持久化，省去手写的 useEffect
+  const [folders, setFolders]       = useLocalStorage(FOLDERS_KEY, {})
   const [editingSlug, setEditingSlug] = useState(null)
   const [inputVal, setInputVal]     = useState('')
 
-  useEffect(() => { saveFolders(folders) }, [folders])
-
   const slugList = useMemo(() => [...favorites].filter(s => ALGORITHMS[s]), [favorites])
 
-  if (slugList.length === 0) {
-    return (
-      <div style={{
-        padding: '16px 20px', borderRadius: 12,
-        background: 'var(--surface)', border: '1px dashed var(--border)',
-        color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center',
-      }}>
-        还没有收藏的算法 · 在算法页点击 ⭐ 即可收藏
-      </div>
-    )
-  }
-
-  // 分组
+  // 分组（必须在 early return 前，保持 hook 顺序稳定）
   const grouped = useMemo(() => {
     const map = {}
     for (const slug of slugList) {
@@ -54,6 +31,24 @@ export default function FavoritesPanel({ favorites }) {
     return sorted.map(f => ({ folder: f, slugs: map[f] }))
   }, [slugList, folders])
 
+  // 所有现有文件夹名（用于快速选择）
+  const existingFolders = useMemo(() => {
+    const set = new Set(Object.values(folders).filter(Boolean))
+    return [...set]
+  }, [folders])
+
+  if (slugList.length === 0) {
+    return (
+      <div style={{
+        padding: '16px 20px', borderRadius: 12,
+        background: 'var(--surface)', border: '1px dashed var(--border)',
+        color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center',
+      }}>
+        还没有收藏的算法 · 在算法页点击 ⭐ 即可收藏
+      </div>
+    )
+  }
+
   const assignFolder = (slug, folderName) => {
     const name = folderName.trim() || UNGROUPED
     setFolders(prev => {
@@ -67,12 +62,6 @@ export default function FavoritesPanel({ favorites }) {
     })
     setEditingSlug(null)
   }
-
-  // 所有现有文件夹名（用于快速选择）
-  const existingFolders = useMemo(() => {
-    const set = new Set(Object.values(folders).filter(Boolean))
-    return [...set]
-  }, [folders])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>

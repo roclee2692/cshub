@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
 import DiskViz from '../DiskViz'
+import VizCard from './VizCard'
 
 export default function DiskPlayground({ algoFn }) {
   const [requestsStr, setRequestsStr] = useState('98, 183, 37, 122, 14, 124, 65, 67')
@@ -53,11 +54,11 @@ export default function DiskPlayground({ algoFn }) {
         </div>
       </div>
 
-      <div style={{ padding: 16, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+      <VizCard borderRadius={8} padding={16} noInner>
         {currentStepData && (
           <DiskViz state={currentStepData} maxTrack={maxTrack} />
         )}
-      </div>
+      </VizCard>
 
       <div style={{ marginTop: 16 }}>
         <StepController 

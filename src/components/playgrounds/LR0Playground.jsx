@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
-import { Toolbar, ToolbarBtn } from './shared'
+import { Toolbar } from './shared'
 
 const TERMINALS = ['id', '+', '$']
 const GOTO_COLS = ['E', 'T']

@@ -1,10 +1,7 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { randomArray, ArrayTextInput } from './inputs/ArrayInput'
-
-const BUCKET_COLORS = [
-  '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
-  '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16',
-]
+import { BUCKET_COLORS } from '../../styles/vizTokens'
 
 const LEGEND = [
   { color: BUCKET_COLORS[0], label: '桶 0' },
@@ -35,13 +32,9 @@ export default function RadixSortPlayground({ algoFn }) {
           positiveOnly={false} width={200} />
       )}
       renderViz={({ current }) => (
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 10, marginBottom: 16, padding: '20px 16px',
-          minHeight: 300,
-        }}>
+        <VizCard borderRadius={10} padding="20px 16px" minHeight={300} noInner>
           <RadixVizContent step={current} />
-        </div>
+        </VizCard>
       )}
       legend={LEGEND}
     />

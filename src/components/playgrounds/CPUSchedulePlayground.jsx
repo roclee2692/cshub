@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Legend } from './shared'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#a855f7', '#06b6d4', '#ef4444', '#84cc16']
@@ -18,17 +19,9 @@ export default function CPUSchedulePlayground({ algoFn }) {
 
   return (
     <div>
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        marginBottom: 16,
-        padding: '20px',
-        overflowX: 'auto',
-        minHeight: 380,
-      }}>
+      <VizCard borderRadius={10} padding={20} minHeight={380} noInner>
         <CPUViz step={current} />
-      </div>
+      </VizCard>
 
       <Legend items={LEGEND} />
 

@@ -6,13 +6,18 @@ import { useAuth } from './AuthContext'
 
 const ProgressContext = createContext(null)
 
-// SyncService 持有 debounce 队列与同步标志，整个 App 共享一个实例即可。
-// 它通过 getUserId() 闭包动态读取当前用户，避免随 userId 重建。
-let _userIdRef = { current: null }
+// SyncService 是应用级单例（module-level），持有 debounce 队列与同步标志。
+// 通过 getUserId() 闭包动态读取当前用户，避免随 userId 变化而重建实例。
+//
+// _syncUserId：类 React ref 的轻量替代。不使用 useRef 是因为 sync 单例
+// 在模块初始化时就需要捕获这个 getter，而 useRef 只能在组件内部调用。
+// 模块内可变变量的代价：测试需要在用例间手动 reset；HMR 重载时保留旧值
+// （无害，下一次 useEffect 会立即写入正确值）。
+let _syncUserId = null
 const sync = createSyncService({
   local: LocalStore,
   remote: RemoteStore,
-  getUserId: () => _userIdRef.current,
+  getUserId: () => _syncUserId,
 })
 
 function applyRealtimePatch(prev, patch) {
@@ -40,9 +45,9 @@ export function ProgressProvider({ children }) {
   const { user } = useAuth()
   const userId = user?.id
 
-  // 保持最新 userId 给 SyncService 闭包读取
+  // 保持最新 userId 给 SyncService 闭包同步读取（见模块顶部注释）
   useEffect(() => {
-    _userIdRef.current = userId || null
+    _syncUserId = userId ?? null
   }, [userId])
 
   const [state, setState] = useState(() => sync.initial())

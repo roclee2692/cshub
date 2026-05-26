@@ -1,3 +1,8 @@
+import SvgCanvas from './svg/SvgCanvas'
+
+// GraphViz — 通用图算法（BFS / DFS / Dijkstra / Prim / Kruskal / Bellman-Ford）可视化
+// SVG 容器样式由 SvgCanvas 统一管理，本组件只关注图逻辑。
+
 const W = 600, H = 360
 
 export default function GraphViz({ graph, stepData, selectedEdge }) {
@@ -23,7 +28,7 @@ export default function GraphViz({ graph, stepData, selectedEdge }) {
   }
 
   return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--border)' }}>
+    <SvgCanvas viewBox={`0 0 ${W} ${H}`}>
       {graph.edges.map((e, i) => {
         const a = nodeMap[e.from], b = nodeMap[e.to]
         if (!a || !b) return null
@@ -71,6 +76,6 @@ export default function GraphViz({ graph, stepData, selectedEdge }) {
           </g>
         )
       })}
-    </svg>
+    </SvgCanvas>
   )
 }

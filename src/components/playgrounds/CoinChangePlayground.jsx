@@ -1,4 +1,5 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { StringField } from './inputs/NumberInput'
 
 const EXAMPLES = [
@@ -80,10 +81,7 @@ function CoinChangePanel({ current, coins, amount }) {
       </div>
 
       {dp && (
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 10, padding: '16px', marginBottom: 16, overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding={16} noInner>
           <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 10, fontWeight: 600 }}>
             dp 数组（dp[i] = 凑出 i 所需的最少硬币数）
           </div>
@@ -126,7 +124,7 @@ function CoinChangePanel({ current, coins, amount }) {
               )
             })}
           </div>
-        </div>
+        </VizCard>
       )}
 
       {phase === 'done' && dp && (

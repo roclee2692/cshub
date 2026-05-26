@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn } from './shared'
 
 const PRESETS = {
@@ -91,7 +92,7 @@ export default function LinkedListPlayground({ algoFn }) {
         ))}
       </Toolbar>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflowX: 'auto' }}>
+      <VizCard borderRadius={10} padding={0} noInner>
         <svg width={Math.max(30 + COLS * (NODE_W + GAP) + 20, 400)} height={Math.max(svgH, 100)} style={{ display: 'block' }}>
           {nodes.length === 0 && (
             <text x={200} y={55} textAnchor="middle" fill="var(--text-tertiary)" fontSize={13}>空链表</text>
@@ -185,7 +186,7 @@ export default function LinkedListPlayground({ algoFn }) {
             </span>
           ))}
         </div>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length} step={ctrl.step} playing={ctrl.playing}
         speed={ctrl.speed} setSpeed={ctrl.setSpeed}

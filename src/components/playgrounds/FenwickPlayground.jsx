@@ -1,4 +1,5 @@
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 
 const LEGEND = [
   { color: '#3b82f6', label: '原数组 a[i]' },
@@ -13,17 +14,9 @@ export default function FenwickPlayground({ algoFn }) {
     <PlaygroundShell
       computeSteps={() => algoFn()}
       renderViz={({ current }) => (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          marginBottom: 16,
-          padding: '24px 20px',
-          overflowX: 'auto',
-          minHeight: 340,
-        }}>
+        <VizCard borderRadius={10} padding="24px 20px" minHeight={340} noInner>
           <FenwickViz step={current} />
-        </div>
+        </VizCard>
       )}
       legend={LEGEND}
     />

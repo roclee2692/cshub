@@ -1,52 +1,14 @@
+import { hoverHandlers } from '../../utils/hoverStyle'
+import { TONES, getTone } from '../../styles/tones'
+
 /**
  * 信息卡片组件（Glassmorphic 风格）
  * type: 'tip' | 'warning' | 'info' | 'danger' | 'success'
+ *
+ * 配色 token 来自 src/styles/tones.js，与 Banner 共享同一份 TONES 表。
  */
-const STYLES = {
-  tip: {
-    bg: 'rgba(52,211,153,0.06)',
-    border: 'rgba(52,211,153,0.25)',
-    glow: 'rgba(52,211,153,0.12)',
-    icon: '💡',
-    label: '技巧',
-    color: '#34d399',
-  },
-  warning: {
-    bg: 'rgba(251,191,36,0.06)',
-    border: 'rgba(251,191,36,0.25)',
-    glow: 'rgba(251,191,36,0.12)',
-    icon: '⚠️',
-    label: '注意',
-    color: '#fbbf24',
-  },
-  info: {
-    bg: 'rgba(96,165,250,0.06)',
-    border: 'rgba(96,165,250,0.25)',
-    glow: 'rgba(96,165,250,0.12)',
-    icon: 'ℹ️',
-    label: '说明',
-    color: '#60a5fa',
-  },
-  danger: {
-    bg: 'rgba(248,113,113,0.06)',
-    border: 'rgba(248,113,113,0.25)',
-    glow: 'rgba(248,113,113,0.12)',
-    icon: '🚨',
-    label: '重要',
-    color: '#f87171',
-  },
-  success: {
-    bg: 'rgba(52,211,153,0.06)',
-    border: 'rgba(52,211,153,0.25)',
-    glow: 'rgba(52,211,153,0.12)',
-    icon: '✅',
-    label: '完成',
-    color: '#34d399',
-  },
-}
-
 export function InfoCard({ type = 'info', title, children }) {
-  const s = STYLES[type]
+  const s = TONES[type] || TONES.info
   return (
     <div style={{
       background: s.bg,
@@ -181,18 +143,10 @@ export function ResourceCard({ title, url, desc, tag, tagColor = 'var(--accent)'
       textDecoration: 'none',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
     }}
-    onMouseEnter={e => {
-      e.currentTarget.style.borderColor = 'var(--accent-border)'
-      e.currentTarget.style.background = 'var(--glass-bg-strong)'
-      e.currentTarget.style.transform = 'translateY(-2px)'
-      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'
-    }}
-    onMouseLeave={e => {
-      e.currentTarget.style.borderColor = 'var(--glass-border-strong)'
-      e.currentTarget.style.background = 'var(--glass-bg-mid)'
-      e.currentTarget.style.transform = 'translateY(0)'
-      e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'
-    }}>
+    {...hoverHandlers(
+      { borderColor: 'var(--accent-border)', background: 'var(--glass-bg-strong)', transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' },
+      { borderColor: 'var(--glass-border-strong)', background: 'var(--glass-bg-mid)', transform: 'translateY(0)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' },
+    )}>
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</span>
@@ -220,7 +174,7 @@ export function ResourceCard({ title, url, desc, tag, tagColor = 'var(--accent)'
  * 横向占满的提示横幅 — 区别于 InfoCard 的小卡片，适合页面顶部声明（免责声明、风险提示）。
  */
 export function Banner({ type = 'info', title, children }) {
-  const s = STYLES[type] || STYLES.info
+  const s = getTone(type)
   return (
     <div style={{
       width: '100%',

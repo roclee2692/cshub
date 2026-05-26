@@ -1,5 +1,6 @@
 import StringViz from '../StringViz'
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { StringField } from './inputs/NumberInput'
 
 const LEGEND_FOR = {
@@ -73,22 +74,17 @@ export default function StringPlayground({ algoFn, algoSlug }) {
         )
       }}
       renderViz={({ current, total }) => (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          marginBottom: 16,
-          padding: '30px 20px',
-          overflowX: 'auto',
-          minHeight: 250,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <VizCard
+          borderRadius={10}
+          padding="30px 20px"
+          minHeight={250}
+          noInner
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
           {total > 0
             ? <StringViz stepData={current} />
             : <div style={{ color: 'var(--text-dim)' }}>请输入有效的主串和模式串</div>}
-        </div>
+        </VizCard>
       )}
       legend={legend}
     />

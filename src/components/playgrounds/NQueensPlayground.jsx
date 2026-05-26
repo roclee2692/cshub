@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import NQueensViz from '../NQueensViz'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar } from './shared'
 
 export default function NQueensPlayground({ algoFn }) {
@@ -27,9 +28,9 @@ export default function NQueensPlayground({ algoFn }) {
         </div>
       </Toolbar>
 
-      <div style={{ padding: 16, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+      <VizCard borderRadius={8} padding={16} noInner style={{ display: 'flex', justifyContent: 'center' }}>
         {currentStepData && <NQueensViz data={currentStepData} nSize={nSize} />}
-      </div>
+      </VizCard>
 
       <StepController 
         total={steps.length} 

@@ -1,27 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useLocalStorage, storageRemove } from '../../hooks/useLocalStorage'
 
 const GOAL_KEY = 'algoviz-goal'
 
-function loadGoal() {
-  try {
-    const raw = localStorage.getItem(GOAL_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch { return null }
-}
-
-function saveGoal(goal) {
-  try { localStorage.setItem(GOAL_KEY, JSON.stringify(goal)) } catch { /* ignore */ }
-}
-
 export default function GoalWidget({ completed }) {
-  const [goal, setGoal]       = useState(() => loadGoal())
+  // 持久化目标到 localStorage，自动处理 SSR / 私密浏览降级
+  const [goal, setGoal]       = useLocalStorage(GOAL_KEY, null)
   const [editing, setEditing] = useState(false)
   const [text, setText]       = useState('')
   const [target, setTarget]   = useState(10)
-
-  useEffect(() => {
-    if (goal) saveGoal(goal)
-  }, [goal])
 
   const handleSave = () => {
     if (target < 1) return
@@ -42,7 +29,7 @@ export default function GoalWidget({ completed }) {
 
   const handleDelete = () => {
     setGoal(null)
-    try { localStorage.removeItem(GOAL_KEY) } catch { /* ignore */ }
+    storageRemove(GOAL_KEY)
     setEditing(false)
   }
 

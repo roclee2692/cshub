@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn } from './shared'
 
 const SCENARIOS = [
@@ -54,13 +55,7 @@ export default function TransactionPlayground({ algoFn }) {
         <TxnColumn name="T2" focusTxn={focusTxn} draft={drafts.T2} />
       </div>
 
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        padding: 14,
-        marginBottom: 12,
-      }}>
+      <VizCard borderRadius={10} padding={14} marginBottom={12} noInner overflowX="hidden">
         <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           已提交版本（physical）
         </div>
@@ -79,17 +74,15 @@ export default function TransactionPlayground({ algoFn }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </VizCard>
 
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        padding: 14,
-        marginBottom: 16,
-        maxHeight: 180,
-        overflowY: 'auto',
-      }}>
+      <VizCard
+        borderRadius={10}
+        padding={14}
+        noInner
+        overflowX="hidden"
+        style={{ maxHeight: 180, overflowY: 'auto' }}
+      >
         <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           事件时间线
         </div>
@@ -113,7 +106,7 @@ export default function TransactionPlayground({ algoFn }) {
             </li>
           ))}
         </ol>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length}
         step={ctrl.step} playing={ctrl.playing} speed={ctrl.speed} setSpeed={ctrl.setSpeed}

@@ -1,5 +1,6 @@
 import CountingSortViz from '../CountingSortViz'
 import PlaygroundShell from './PlaygroundShell'
+import VizCard from './VizCard'
 import { randomArray, ArrayTextInput } from './inputs/ArrayInput'
 
 const LEGEND = [
@@ -31,16 +32,9 @@ export default function CountingSortPlayground({ algoFn }) {
           placeholder="自定义：3 1 4 1 5 9 2（值 ≤ 99）" />
       )}
       renderViz={({ current }) => (
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          marginBottom: 16,
-          padding: '20px 12px',
-          overflowX: 'auto',
-        }}>
+        <VizCard borderRadius={10} padding="20px 12px" noInner>
           <CountingSortViz stepData={current} />
-        </div>
+        </VizCard>
       )}
       legend={LEGEND}
     />

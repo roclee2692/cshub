@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn } from './shared'
 
 const PRESETS = {
@@ -99,7 +100,7 @@ export default function BPlusTreePlayground({ algoFn }) {
         </span>
       </Toolbar>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflowX: 'auto' }}>
+      <VizCard borderRadius={10} padding={0} noInner>
         <svg width={svgW} height={svgH} style={{ display: 'block' }}>
           {/* 边 */}
           {layout && drawEdges(layout, 20, 20).map((edge, i) => (
@@ -137,7 +138,7 @@ export default function BPlusTreePlayground({ algoFn }) {
             )
           })}
         </svg>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length}
         step={ctrl.step} playing={ctrl.playing} speed={ctrl.speed} setSpeed={ctrl.setSpeed}

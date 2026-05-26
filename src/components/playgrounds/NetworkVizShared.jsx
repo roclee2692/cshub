@@ -1,16 +1,10 @@
+import VizCard from './VizCard'
+
 export function NetworkPanel({ children, minHeight = 360 }) {
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 10,
-      marginBottom: 16,
-      padding: '22px 18px',
-      overflowX: 'auto',
-      minHeight,
-    }}>
+    <VizCard borderRadius={10} padding="22px 18px" minHeight={minHeight} noInner>
       {children}
-    </div>
+    </VizCard>
   )
 }
 

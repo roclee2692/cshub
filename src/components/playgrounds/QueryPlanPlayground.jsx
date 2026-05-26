@@ -36,11 +36,7 @@ function computeLayout(nodes, edges) {
 
   // 找根节点（没有任何节点以它为 from 的子节点，即它没有父节点）
   // edges: { from: child, to: parent }
-  const childIds = new Set(edges.map(e => e.from))
-  const parentIds = new Set(edges.map(e => e.to))
-
-  // 根节点：在 parentIds 中但不在 childIds 中，即它有子节点但没有父节点
-  // 实际上：根节点是出现在 to 但不出现在 from 的（有子节点的），或者没有出现在 from/to 的叶子
+  // 根节点：在 to 中出现（有子节点）但不在 from 中出现（没有父节点）的节点
   // 简化：建立父子关系
   const childrenOf = {} // nodeId → [childId]
   for (const n of nodes) childrenOf[n.id] = []
@@ -97,30 +93,6 @@ function computeLayout(nodes, edges) {
   }
 
   return { positions, nodeW, nodeH, maxLevel, byLevel }
-}
-
-// 箭头（从子节点中心上方 → 父节点中心下方）
-function Arrow({ x1, y1, x2, y2, active }) {
-  const color = active ? '#a855f7' : 'var(--border)'
-  const mx = (x1 + x2) / 2
-  const my = (y1 + y2) / 2
-  return (
-    <g>
-      <defs>
-        <marker id={`arrow-${active ? 'active' : 'idle'}`}
-          markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-          <path d="M0,0 L0,8 L8,4 z" fill={color} />
-        </marker>
-      </defs>
-      <line
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        stroke={color}
-        strokeWidth={active ? 2 : 1}
-        markerEnd={`url(#arrow-${active ? 'active' : 'idle'})`}
-        strokeDasharray={active ? '5 3' : 'none'}
-      />
-    </g>
-  )
 }
 
 // 单个计划节点（SVG foreignObject 内嵌 div）
@@ -210,42 +182,19 @@ function PlanNode({ node, x, y, nodeW, nodeH, isActive }) {
   )
 }
 
-// 流动的元组标签
-function TupleFlow({ fromPos, toPos, value, nodeH }) {
-  if (!fromPos || !toPos) return null
-  const mx = (fromPos.x + toPos.x) / 2
-  const my = (fromPos.y - nodeH / 2 + toPos.y + nodeH / 2) / 2
-  return (
-    <g>
-      <rect
-        x={mx - 36} y={my - 10} width={72} height={20}
-        rx={6} ry={6}
-        fill="#a855f720" stroke="#a855f7" strokeWidth={1}
-      />
-      <text
-        x={mx} y={my + 4}
-        textAnchor="middle"
-        style={{ fontSize: 9, fill: '#a855f7', fontFamily: 'var(--font-mono)', fontWeight: 700 }}
-      >
-        {value}
-      </text>
-    </g>
-  )
-}
-
 export default function QueryPlanPlayground({ algoFn }) {
   const [queryId, setQueryId] = useState('select')
 
   const steps = useMemo(() => algoFn(queryId), [algoFn, queryId])
   const ctrl = useStepController(steps)
   const current = steps[ctrl.step]
-  if (!current) return null
+  const { nodes = [], edges = [], activeNodeId, tupleFlow = [] } = current || {}
 
-  const { nodes, edges, activeNodeId, tupleFlow } = current
-
-  // 计算布局
+  // 计算布局（必须在 early return 前调用，保持 hook 调用顺序稳定）
   const layout = useMemo(() => computeLayout(nodes, edges), [nodes, edges])
   const { positions, nodeW, nodeH, maxLevel } = layout || {}
+
+  if (!current) return null
 
   const SVG_PADDING = 60
   const SVG_W = 600

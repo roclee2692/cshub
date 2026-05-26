@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { getSupabase, hasSupabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { storageGet, storageSet } from '../../hooks/useLocalStorage'
 
 const LOCAL_NOTE_KEY = (slug) => `algoviz-note-${slug}`
 
@@ -21,17 +22,14 @@ export default function Notes({ slug }) {
 
   // 加载我的笔记：先 localStorage 兜底，登录后拉云端覆盖
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LOCAL_NOTE_KEY(slug))
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        setContent(parsed.content || '')
-        setIsPublic(!!parsed.is_public)
-      } else {
-        setContent('')
-        setIsPublic(false)
-      }
-    } catch { /* ignore */ }
+    const parsed = storageGet(LOCAL_NOTE_KEY(slug), null)
+    if (parsed) {
+      setContent(parsed.content || '')
+      setIsPublic(!!parsed.is_public)
+    } else {
+      setContent('')
+      setIsPublic(false)
+    }
     setNoteId(null)
   }, [slug])
 
@@ -74,9 +72,7 @@ export default function Notes({ slug }) {
 
   // 本地实时镜像（防止刷新丢笔记）
   useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_NOTE_KEY(slug), JSON.stringify({ content, is_public: isPublic }))
-    } catch { /* ignore */ }
+    storageSet(LOCAL_NOTE_KEY(slug), { content, is_public: isPublic })
   }, [content, isPublic, slug])
 
   // 云端防抖保存

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
 import ElevatorViz from '../ElevatorViz'
+import VizCard from './VizCard'
 
 export default function ElevatorPlayground({ algoFn }) {
   const [requestsStr, setRequestsStr] = useState('5, 18, 3, 12, 14, 21, 6, 8')
@@ -53,11 +54,11 @@ export default function ElevatorPlayground({ algoFn }) {
         </div>
       </div>
 
-      <div style={{ padding: 16, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+      <VizCard borderRadius={8} padding={16} noInner>
         {currentStepData && (
           <ElevatorViz state={currentStepData} maxTrack={maxTrack} />
         )}
-      </div>
+      </VizCard>
 
       <div style={{ marginTop: 16 }}>
         <StepController 

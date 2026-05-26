@@ -1,4 +1,5 @@
 import { useIsPhone } from '../../hooks/useMediaQuery'
+import { hoverHandlers, hoverHandlersIf } from '../../utils/hoverStyle'
 
 export function Toolbar({ children }) {
   const isPhone = useIsPhone()
@@ -46,18 +47,13 @@ export function ToolbarBtn({ children, onClick, active }) {
         letterSpacing: '-0.01em',
         WebkitTapHighlightColor: 'transparent',
       }}
-      onMouseEnter={e => {
-        if (!active) {
-          e.currentTarget.style.background = 'var(--glass-bg-strong)'
-          e.currentTarget.style.color = 'var(--text-primary)'
-        }
-      }}
-      onMouseLeave={e => {
-        if (!active) {
-          e.currentTarget.style.background = 'var(--glass-bg-mid)'
-          e.currentTarget.style.color = 'var(--text-secondary)'
-        }
-      }}
+      {...hoverHandlersIf(active, {
+        background: 'var(--glass-bg-strong)',
+        color: 'var(--text-primary)',
+      }, {
+        background: 'var(--glass-bg-mid)',
+        color: 'var(--text-secondary)',
+      })}
     >
       {children}
     </button>
@@ -111,8 +107,10 @@ export function TextInput({ value, onChange, placeholder, onSubmit, submitLabel 
           whiteSpace: 'nowrap',
           WebkitTapHighlightColor: 'transparent',
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-dim)'; e.currentTarget.style.color = 'white' }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-soft)'; e.currentTarget.style.color = 'var(--accent-light)' }}
+        {...hoverHandlers(
+          { background: 'var(--accent-dim)', color: 'white' },
+          { background: 'var(--accent-soft)', color: 'var(--accent-light)' },
+        )}
       >
         {submitLabel}
       </button>

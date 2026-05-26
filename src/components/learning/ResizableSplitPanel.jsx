@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { useDrag } from '../../hooks/useDrag'
 
 /**
  * ResizableSplitPanel - iPad 风格可调节分割面板
  * 支持拖动分割线调整左右面板的宽度
- * 
+ *
  * 特性：
- * - 平滑的拖动体验
+ * - 平滑的拖动体验（由 useDrag 统一处理 mousedown / mousemove / mouseup + 触屏）
  * - 最小宽度限制防止面板太小
- * - localStorage 持久化用户偏好
+ * - localStorage 持久化用户偏好（由 useLocalStorage 统一处理）
  * - 自适应响应式设计
  */
 export default function ResizableSplitPanel({
@@ -17,60 +19,24 @@ export default function ResizableSplitPanel({
   minWidth = 200,
   defaultRatio = 0.5,
 }) {
-  const [ratio, setRatio] = useState(defaultRatio)
+  const [ratio, setRatio] = useLocalStorage(storageKey, defaultRatio)
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef(null)
-  
-  // 初始化：从 localStorage 读取用户偏好
-  useEffect(() => {
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      try {
-        setRatio(parseFloat(saved))
-      } catch {
-        // 忽略解析错误，使用默认值
-      }
-    }
-  }, [storageKey])
-  
-  // 处理拖动事件
-  useEffect(() => {
-    if (!isDragging || !containerRef.current) return
-    
-    const handleMouseMove = (e) => {
+
+  // useDrag 抽出 mousedown → 全局 mousemove/up → cleanup 模板
+  const handleMouseDown = useDrag({
+    cursor: 'col-resize',
+    onStart: () => setIsDragging(true),
+    onEnd:   () => setIsDragging(false),
+    onMove:  (e) => {
       const container = containerRef.current
       if (!container) return
-      
       const rect = container.getBoundingClientRect()
       const newX = e.clientX - rect.left
-      
-      // 计算新的比例，考虑最小宽度限制
       const clampedX = Math.max(minWidth, Math.min(newX, rect.width - minWidth - 16))
-      const newRatio = clampedX / rect.width
-      
-      setRatio(newRatio)
-      
-      // 实时保存到 localStorage
-      localStorage.setItem(storageKey, newRatio.toString())
-    }
-    
-    const handleMouseUp = () => {
-      setIsDragging(false)
-    }
-    
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, storageKey, minWidth])
-  
-  const handleMouseDown = (e) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
+      setRatio(clampedX / rect.width)
+    },
+  })
   
   const leftWidth = ratio * 100
   const rightWidth = (1 - ratio) * 100
@@ -103,6 +69,7 @@ export default function ResizableSplitPanel({
       {/* 分割线 */}
       <div
         onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
         style={{
           width: 8,
           flex: '0 0 8px',

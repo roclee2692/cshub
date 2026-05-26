@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { StepProvider } from '../contexts/StepContext'
 import { ALGORITHMS, ALGORITHM_LIST } from '../data/algorithmMeta'
@@ -86,7 +86,13 @@ function AlgorithmPageFallback() {
 }
 
 function AlgorithmPageContent({ algo, loadError }) {
-  const playground = <AlgorithmPlaygroundFor key={algo.slug} algo={algo} />
+  // useMemo 稳定 playground JSX 引用：algo 在加载后不会重建，
+  // 因此 playground 引用不变，InteractiveVisualization 的 memo 才能生效。
+  const playground = useMemo(
+    () => <AlgorithmPlaygroundFor key={algo.slug} algo={algo} />,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [algo.slug],   // slug 变化时才重建（切换算法）
+  )
   const showCode = Boolean(algo.code)
   const pageTitle = getDisplayName(algo)
   const [searchParams] = useSearchParams()

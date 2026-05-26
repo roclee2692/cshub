@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import StepController, { useStepController } from '../StepController'
+import VizCard from './VizCard'
 import { Toolbar, ToolbarBtn } from './shared'
 
 const PRESETS = {
@@ -70,7 +71,7 @@ export default function TriePlayground({ algoFn }) {
         </div>
       </Toolbar>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 16, overflowX: 'auto' }}>
+      <VizCard borderRadius={10} padding={0} noInner>
         <svg width={Math.max(maxX + 40, 400)} height={Math.max(maxY + 20, 120)} style={{ display: 'block' }}>
           {edges.map((e, i) => {
             const a = posMap[e.from], b = posMap[e.to]
@@ -117,7 +118,7 @@ export default function TriePlayground({ algoFn }) {
             </span>
           ))}
         </div>
-      </div>
+      </VizCard>
 
       <StepController total={steps.length} step={ctrl.step} playing={ctrl.playing}
         speed={ctrl.speed} setSpeed={ctrl.setSpeed}
