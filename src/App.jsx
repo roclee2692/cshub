@@ -30,6 +30,8 @@ const GuitarPage = lazy(() => import('./pages/GuitarPage'))
 const GuitarLessonPage = lazy(() => import('./pages/GuitarLessonPage'))
 const ViolinPage = lazy(() => import('./pages/ViolinPage'))
 const ViolinLessonPage = lazy(() => import('./pages/ViolinLessonPage'))
+const AIPage = lazy(() => import('./pages/AIPage'))
+const AILessonPage = lazy(() => import('./pages/AILessonPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function PageFallback() {
@@ -82,6 +84,8 @@ export default function App() {
             <Route path="/guitar/lesson/:lessonId" element={<GuitarLessonPage />} />
             <Route path="/violin" element={<ViolinPage />} />
             <Route path="/violin/lesson/:lessonId" element={<ViolinLessonPage />} />
+            <Route path="/ai-course" element={<AIPage />} />
+            <Route path="/ai-course/lesson/:lessonId" element={<AILessonPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

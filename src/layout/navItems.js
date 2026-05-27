@@ -59,4 +59,12 @@ export const NAV_ITEMS = [
     icon: '🌱',
     match: pathname => pathname === '/growth' || pathname.startsWith('/growth/'),
   },
+  {
+    id: 'ai-course',
+    to: '/ai-course',
+    label: 'AI 专业课',
+    shortLabel: 'AI',
+    icon: '🤖',
+    match: pathname => pathname === '/ai-course' || pathname.startsWith('/ai-course/'),
+  },
 ]

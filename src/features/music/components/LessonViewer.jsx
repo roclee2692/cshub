@@ -1,5 +1,10 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+
+const REMARK_PLUGINS = [remarkGfm, remarkMath]
+const REHYPE_PLUGINS = [rehypeKatex]
 
 export default function LessonViewer({ lesson, completed, onComplete, exerciseSlot }) {
   if (!lesson) return null
@@ -15,7 +20,9 @@ export default function LessonViewer({ lesson, completed, onComplete, exerciseSl
 
       {lesson.theory && (
         <div className="prose-lesson mb-8">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.theory}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>
+            {lesson.theory}
+          </ReactMarkdown>
         </div>
       )}
 

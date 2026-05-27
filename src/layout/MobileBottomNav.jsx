@@ -190,6 +190,15 @@ function TabIcon({ id }) {
           <path d="M12 15c0-3.5-2.5-6-7-7 0 4.5 3 7 7 7Z" />
         </svg>
       )
+    case 'ai-course':
+      return (
+        <svg {...common}>
+          <rect x="4" y="4" width="16" height="16" rx="3" />
+          <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none" />
+          <path d="M9 16c1.5 1.5 4.5 1.5 6 0" />
+        </svg>
+      )
     default:
       return (
         <svg {...common}>
