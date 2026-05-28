@@ -15,13 +15,30 @@ const LANGS = [
 ]
 
 const DETAIL_TABS = [
-  { id: 'why', label: 'WHY', title: '原理说明' },
-  { id: 'pseudocode', label: 'PSEUDOCODE', title: '伪代码' },
-  { id: 'bigO', label: 'BIG-O', title: '复杂度' },
-  { id: 'compare', label: 'COMPARE', title: '方法对比' },
-  { id: 'quiz', label: 'QUIZ', title: '小测验' },
-  { id: 'notes', label: 'NOTES', title: '笔记' },
+  { id: 'why', label: '原理', short: 'why', icon: '💡', title: '原理说明' },
+  { id: 'pseudocode', label: '伪代码', short: 'pseudocode', icon: '🧩', title: '伪代码' },
+  { id: 'bigO', label: '复杂度', short: 'big-o', icon: '📈', title: '复杂度' },
+  { id: 'compare', label: '对比', short: 'compare', icon: '⚖️', title: '方法对比' },
+  { id: 'quiz', label: '测验', short: 'quiz', icon: '📝', title: '小测验' },
+  { id: 'notes', label: '笔记', short: 'notes', icon: '📓', title: '笔记' },
 ]
+
+const VARIANT_LABELS = {
+  bgd: 'BGD',
+  sgd: 'SGD',
+  mini: 'Mini-batch',
+}
+
+const VARIANT_LEARNING_RATES = {
+  bgd: 0.002,
+  sgd: 0.001,
+  mini: 0.0015,
+}
+
+const CODE_HIGHLIGHT_LINES = {
+  cpp: { bgd: 25, sgd: 18, mini: 21 },
+  python: { bgd: 11, sgd: 5, mini: 8 },
+}
 
 export default function LessonViewer({ lesson, completed, onComplete, exerciseSlot }) {
   const [lang, setLang] = useState('cpp')
@@ -29,11 +46,12 @@ export default function LessonViewer({ lesson, completed, onComplete, exerciseSl
   const [quizChoice, setQuizChoice] = useState(null)
   const [quizRevealed, setQuizRevealed] = useState(false)
   const [note, setNote] = useState('')
+  const [codeFocus, setCodeFocus] = useState('bgd')
   if (!lesson) return null
 
   const isRichExercise = lesson.id === RICH_EXERCISE_LESSON_ID && !!lesson.code && !!exerciseSlot
   const articleClass = isRichExercise
-    ? 'w-full max-w-[1500px] mx-auto pb-16'
+    ? 'w-full max-w-[1700px] mx-auto pb-16'
     : 'max-w-2xl mx-auto pb-16'
   const currentLang = LANGS.find(item => item.key === lang) || LANGS[0]
 
@@ -58,6 +76,8 @@ export default function LessonViewer({ lesson, completed, onComplete, exerciseSl
             lang={lang}
             currentLang={currentLang}
             onLangChange={setLang}
+            codeFocus={codeFocus}
+            onCodeFocusChange={setCodeFocus}
           />
         ) : (
           <section className="mb-8 p-4 rounded-xl bg-surface border border-border-soft">
@@ -119,7 +139,18 @@ export default function LessonViewer({ lesson, completed, onComplete, exerciseSl
   )
 }
 
-function RichExercise({ lesson, exerciseSlot, lang, currentLang, onLangChange }) {
+function RichExercise({ lesson, exerciseSlot, lang, currentLang, onLangChange, codeFocus, onCodeFocusChange }) {
+  const highlightLine = CODE_HIGHLIGHT_LINES[lang]?.[codeFocus] ?? null
+
+  function handleVisualClickCapture(event) {
+    const button = event.target.closest?.('button')
+    const label = button?.textContent?.trim().toLowerCase()
+    if (!label) return
+    if (label.includes('mini')) onCodeFocusChange('mini')
+    else if (label.includes('sgd')) onCodeFocusChange('sgd')
+    else if (label.includes('bgd')) onCodeFocusChange('bgd')
+  }
+
   return (
     <section
       data-ai-rich-exercise="optim-gd-variants"
@@ -129,13 +160,17 @@ function RichExercise({ lesson, exerciseSlot, lang, currentLang, onLangChange })
         互动练习
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.6fr)_minmax(380px,0.4fr)] gap-4 xl:min-h-[600px]">
-        <div data-ai-rich-visual className="min-h-[560px] rounded-lg border border-border-soft bg-[#0b0d10] p-4 overflow-auto">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(560px,0.58fr)_minmax(420px,0.42fr)] 2xl:grid-cols-[minmax(620px,0.58fr)_minmax(460px,0.42fr)] gap-4 xl:min-h-[600px]">
+        <div
+          data-ai-rich-visual
+          onClickCapture={handleVisualClickCapture}
+          className="min-h-[560px] rounded-lg border border-border-soft bg-[#0b0d10] p-4"
+        >
           {exerciseSlot}
         </div>
 
         <aside data-ai-rich-code className="min-h-[560px] rounded-lg border border-border-soft bg-[var(--bg-elev)] p-3 flex flex-col gap-3 overflow-hidden">
-          <VariableSnapshot snapshot={lesson.variablesSnapshot} />
+          <VariableSnapshot snapshot={lesson.variablesSnapshot} codeFocus={codeFocus} />
 
           <div className="flex-1 min-h-0 flex flex-col">
             <div className="flex items-center gap-2 mb-2">
@@ -166,9 +201,13 @@ function RichExercise({ lesson, exerciseSlot, lang, currentLang, onLangChange })
                 code={lesson.code?.[lang] || ''}
                 lang={lang}
                 title={`gd_variants.${currentLang.ext}`}
+                highlightLine={highlightLine}
                 noAutoScroll
                 fill
               />
+            </div>
+            <div className="mt-2 text-[11px] leading-5 text-fg-faint">
+              当前高亮：{VARIANT_LABELS[codeFocus]} 相关更新逻辑。点击左侧 BGD / SGD / Mini-batch 按钮会同步切换高亮。
             </div>
           </div>
         </aside>
@@ -177,10 +216,10 @@ function RichExercise({ lesson, exerciseSlot, lang, currentLang, onLangChange })
   )
 }
 
-function VariableSnapshot({ snapshot = {} }) {
+function VariableSnapshot({ snapshot = {}, codeFocus }) {
   const rows = [
-    ['variant', snapshot.variant ?? '-'],
-    ['learningRate', snapshot.learningRate ?? '-'],
+    ['variant', VARIANT_LABELS[codeFocus] ?? snapshot.variant ?? '-'],
+    ['learningRate', VARIANT_LEARNING_RATES[codeFocus] ?? snapshot.learningRate ?? '-'],
     ['position', snapshot.position ?? '-'],
     ['loss', snapshot.loss ?? '-'],
   ]
@@ -239,7 +278,11 @@ function LessonDetailTabs({
                   : 'text-[var(--text-secondary)] hover:bg-[var(--glass-bg-strong)] hover:text-[var(--text-primary)]',
               ].join(' ')}
             >
-              {tab.label}
+              <span className="text-[15px] leading-none">{tab.icon}</span>
+              <span>{tab.label}</span>
+              <span className="hidden text-[10px] font-mono lowercase tracking-wide text-[var(--text-tertiary)] sm:inline">
+                {tab.short}
+              </span>
             </button>
           )
         })}
