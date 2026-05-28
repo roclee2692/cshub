@@ -30,6 +30,95 @@ $$\\theta \\leftarrow \\theta - \\alpha \\nabla L(\\theta)$$
 SGD 的噪声反而有好处——能跳出局部最优。
 `,
           exercise: { type: 'playground', viz: 'gdVariants' },
+          code: {
+            cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+Point grad_rosenbrock(Point p) {
+    double gx = -2 * (1 - p.x) - 400 * p.x * (p.y - p.x * p.x);
+    double gy = 200 * (p.y - p.x * p.x);
+    return {gx, gy};
+}
+
+Point gd_step(Point p, double lr, string variant) {
+    Point g = grad_rosenbrock(p);
+
+    if (variant == "sgd") {
+        g.x += random_noise();
+        g.y += random_noise();
+    } else if (variant == "mini") {
+        g.x += 0.3 * random_noise();
+        g.y += 0.3 * random_noise();
+    }
+
+    return {
+        p.x - lr * g.x,
+        p.y - lr * g.y
+    };
+}`,
+            python: `def gd_step(x, y, lr, variant):
+    gx, gy = grad_rosenbrock(x, y)
+
+    if variant == "sgd":
+        gx += random_noise()
+        gy += random_noise()
+    elif variant == "mini":
+        gx += 0.3 * random_noise()
+        gy += 0.3 * random_noise()
+
+    return (
+        x - lr * gx,
+        y - lr * gy,
+    )`
+          },
+          variablesSnapshot: {
+            variant: 'BGD',
+            learningRate: 0.002,
+            position: '(-1.50, 2.00)',
+            loss: '12.34'
+          },
+          pseudocode: `procedure GD_VARIANTS(start, learningRate, variant)
+    point <- start
+    for step <- 1 to maxSteps do
+        gradient <- grad(loss, point)
+
+        if variant = SGD then
+            gradient <- gradient + sampleNoise()
+        else if variant = MINI_BATCH then
+            gradient <- gradient + smallBatchNoise()
+        end if
+
+        point <- point - learningRate * gradient
+        record(point, loss(point))
+    end for
+    return path`,
+          bigO: {
+            time: '可视化固定迭代 T 步，每步计算一次二维梯度，因此演示复杂度为 O(T)。真实训练中 BGD 每步需要扫 N 个样本，SGD 为 O(1)，Mini-batch 为 O(B)。',
+            space: '保存轨迹 path 需要 O(T)；只做在线更新时，参数和梯度都是常数空间 O(1)。',
+            note: '这里的 T 是迭代步数，N 是数据集规模，B 是 mini-batch 大小。',
+          },
+          compare: [
+            { method: 'BGD', data: '全部 N 个样本', strength: '梯度稳定，路径平滑', tradeoff: '单步最慢，大数据集代价高' },
+            { method: 'SGD', data: '1 个样本', strength: '单步最快，噪声有探索性', tradeoff: '震荡明显，收敛曲线不稳定' },
+            { method: 'Mini-batch', data: 'B 个样本', strength: '速度和稳定性折中', tradeoff: '需要选择合适 batch size' },
+          ],
+          quiz: [
+            {
+              q: '为什么 SGD 的轨迹通常比 BGD 更抖动？',
+              options: [
+                '因为 SGD 每步只用一个或少量样本估计梯度',
+                '因为 SGD 的学习率必须恒等于 0',
+                '因为 BGD 不需要计算梯度',
+                '因为 Mini-batch 不会产生随机性',
+              ],
+              answer: 0,
+              explanation: 'SGD 使用少量样本估计整体梯度，估计方差更大，所以路径更抖动；这种噪声有时也能帮助跳出较差区域。',
+            },
+          ],
         },
         {
           id: 'optim-momentum',
