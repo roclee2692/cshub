@@ -43,6 +43,39 @@ const BOOK_META = {
     tagline:    '价值投资的圣经，格雷厄姆的投资智慧',
     coverGrad:  'linear-gradient(145deg, rgba(74,112,151,0.44) 0%, rgba(7,20,15,0.82) 100%)',
   },
+  'poor-charlie': {
+    title:      '《穷查理宝典》',
+    titleEn:    'Poor Charlie’s Almanack',
+    author:     'Charlie Munger',
+    mark:       'MUNGER',
+    tone:       'green',
+    accentHex:  '#4c9769',
+    accentRgb:  '76, 151, 105',
+    tagline:    '多元思维模型、逆向思考与长期理性',
+    coverGrad:  'linear-gradient(145deg, rgba(76,151,105,0.44) 0%, rgba(7,20,15,0.82) 100%)',
+  },
+  navalmanack: {
+    title:      '《纳瓦尔宝典》',
+    titleEn:    'The Almanack of Naval Ravikant',
+    author:     'Eric Jorgenson',
+    mark:       'NAVAL',
+    tone:       'teal',
+    accentHex:  '#42b99a',
+    accentRgb:  '66, 185, 154',
+    tagline:    '关于财富、判断力、杠杆与幸福的系统思考',
+    coverGrad:  'linear-gradient(145deg, rgba(66,185,154,0.42) 0%, rgba(7,20,15,0.82) 100%)',
+  },
+  principles: {
+    title:      '《原则》',
+    titleEn:    'Principles',
+    author:     'Ray Dalio',
+    mark:       'RULES',
+    tone:       'slate',
+    accentHex:  '#8aa0a0',
+    accentRgb:  '138, 160, 160',
+    tagline:    '把经验沉淀成可复盘、可执行的原则系统',
+    coverGrad:  'linear-gradient(145deg, rgba(138,160,160,0.42) 0%, rgba(7,20,15,0.82) 100%)',
+  },
 }
 
 // 书摘内容（待填充）
@@ -50,6 +83,9 @@ const BOOK_NOTES = {
   'money-psychology':    { themes: [], quotes: [], reflections: [] },
   'salary-millions':     { themes: [], quotes: [], reflections: [] },
   'intelligent-investor':{ themes: [], quotes: [], reflections: [] },
+  'poor-charlie':        { themes: [], quotes: [], reflections: [] },
+  navalmanack:           { themes: [], quotes: [], reflections: [] },
+  principles:            { themes: [], quotes: [], reflections: [] },
 }
 
 export default function BookNotesPage() {

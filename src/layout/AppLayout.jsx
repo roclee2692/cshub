@@ -29,7 +29,7 @@ export default function AppLayout() {
   const { pathname } = useLocation()
   const isHome = pathname === '/'
   const isAlgo = pathname.startsWith('/algo') || pathname.startsWith('/compare')
-  const isGuide = GUIDE_PATHS.some(path => pathname.startsWith(path))
+  const isGuide = GUIDE_PATHS.some(path => pathname === path || pathname.startsWith(path + '/'))
   const hasGuideSidebar = GUIDE_BACK_PATHS.has(pathname)
   const floatingBackTarget = getFloatingBackTarget(pathname)
   // 三档断点：phone ≤640 / ipad 641-1024 / desktop >1024

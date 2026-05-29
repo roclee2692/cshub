@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { wealthFramework } from '../data/wealth'
 
 // ─────────────────────────────────────────────────────────────
 // 理财 · 人赚不到认知以外的钱
@@ -10,71 +11,20 @@ import { useNavigate } from 'react-router-dom'
 //     滚到底/顶后才触发翻页（使用 contentScrollRef 边界判断）
 // ─────────────────────────────────────────────────────────────
 
-const BOOKS = [
-  {
-    title: '《金钱心理学》',
-    mark: 'MONEY',
-    tone: 'amber',
-    slug: 'money-psychology',
-    coverTitle: '金钱心理学',
-    coverSubtitle: 'The Psychology of Money',
-    coverAuthor: '摩根·豪泽尔',
-  },
-  {
-    title: '《拿工薪，三十几岁你也能赚到600万》',
-    mark: 'SALARY',
-    tone: 'green',
-    slug: 'salary-millions',
-    coverTitle: '拿工薪',
-    coverSubtitle: '三十几岁你也能赚到600万',
-    coverAuthor: '安德鲁·哈勒姆',
-  },
-  {
-    title: '《聪明的投资者》',
-    mark: 'VALUE',
-    tone: 'blue',
-    slug: 'intelligent-investor',
-    coverTitle: '聪明的投资者',
-    coverSubtitle: 'The Intelligent Investor',
-    coverAuthor: '本杰明·格雷厄姆',
-  },
-]
-
-const STEPS = [
-  {
-    number: '01',
-    title: '财务自由的第一步：提高认知',
-    body: '先提高认知，再谈机会。认知决定你看得懂什么、拿得住什么，也决定你能避开什么。',
-  },
-  {
-    number: '02',
-    title: '第二步：长期持有，永不卖出',
-    body: '把注意力从短期涨跌里拿回来。长期持有的难点不是计算，而是纪律、耐心和对资产的理解。',
-  },
-  {
-    number: '03',
-    title: '第三步：保持身体健康',
-    body: '保持身体健康，长生不老，永远不死。时间是复利的燃料，健康是长期主义的本金。',
-  },
-]
-
-const FINANCE_BASICS = [
-  {
-    mark: 'HOUSE',
-    title: '到底该不该买房？',
-    body: '先把它拆成居住需求和投资决策。自住要看城市稳定性、通勤、家庭计划和月供压力；投资要比较租售比、贷款利率、持有成本、流动性和机会成本。',
-  },
-  {
-    mark: 'CAR',
-    title: '到底该不该买车？',
-    body: '车多数时候是消费品，不是资产。买之前先算购置税、保险、停车、保养、折旧和使用频率；如果它明显提升通勤效率或收入能力，才可能值得提前买。',
-  },
-  {
-    mark: 'ROI',
-    title: '投资回报率如何权衡？',
-    body: '不要只看预期收益率，要同时看风险、时间、流动性和你的可承受亏损。教育、健康、技能和人脉的回报不一定立刻变现，但可能改变长期收入上限。',
-  },
-]
+const {
+  disclaimer,
+  manifesto,
+  antifragile,
+  assetClasses,
+  allocationSystem,
+  investorProfile,
+  psychologySystem,
+  riskManagement,
+  phases,
+  books,
+  financeBasics,
+  closing,
+} = wealthFramework
 
 const PAGES    = 2
 const ANIM_MS  = 800
@@ -239,28 +189,263 @@ export default function FinancePage() {
             key={contentKey}
             ref={contentScrollRef}
             className="finance-content finance-content-scrollable"
-            aria-label="理财三步"
+            aria-label="长期财富课程"
           >
             <section className="finance-disclaimer" aria-label="免责声明">
-              <strong>免责声明</strong>
-              <p>
-                本章节只用于学习、阅读和认知提升，不构成任何投资建议、收益承诺或买卖指令。所有投资决策都应结合个人风险承受能力，并自行承担结果。
-              </p>
+              <strong>{disclaimer.label}</strong>
+              <p>{disclaimer.body}</p>
             </section>
 
-            <section className="finance-step finance-step-featured">
-              <div className="finance-step-copy">
-                <div className="finance-step-index">01</div>
-                <h2>财务自由的第一步：提高认知</h2>
+            <section className="finance-course-section finance-why-section" aria-label="为什么要理财">
+              <div className="finance-section-header">
+                <span>{manifesto.eyebrow}</span>
+                <h2>{manifesto.title}</h2>
+                <p>{manifesto.lead}</p>
+              </div>
+              <div className="finance-why-grid">
+                {manifesto.points.map((point, index) => (
+                  <article className="finance-principle-card" key={point}>
+                    <em>{String(index + 1).padStart(2, '0')}</em>
+                    <p>{point}</p>
+                  </article>
+                ))}
+              </div>
+              <p className="finance-section-note">{manifesto.note}</p>
+            </section>
+
+            <section className="finance-course-section finance-antifragile-section" aria-label="反脆弱北极星">
+              <div className="finance-section-header finance-section-header-split">
+                <div>
+                  <span>{antifragile.eyebrow}</span>
+                  <h2>{antifragile.title}</h2>
+                </div>
+                <p>{antifragile.lead}</p>
+              </div>
+              <div className="finance-principle-grid">
+                {antifragile.principles.map((item, index) => (
+                  <article className="finance-principle-card" key={item}>
+                    <em>{String(index + 1).padStart(2, '0')}</em>
+                    <p>{item}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="finance-course-section" aria-label="认识资产类别">
+              <div className="finance-section-header">
+                <span>ASSET MAP</span>
+                <h2>认识不同资产的角色</h2>
                 <p>
-                  先提高认知，再谈机会。认知决定你看得懂什么、拿得住什么，也决定你能避开什么。
+                  资产没有绝对最好，只有风险、收益来源、流动性和使用场景的差异。先理解角色，再决定比例。
                 </p>
               </div>
+              <div className="finance-asset-grid">
+                {assetClasses.map(asset => (
+                  <article className="finance-asset-card" key={asset.name}>
+                    <div className="finance-asset-card-head">
+                      <span>{asset.name}</span>
+                      <strong>{asset.role}</strong>
+                    </div>
+                    <dl>
+                      <div>
+                        <dt>收益来源</dt>
+                        <dd>{asset.returnSource}</dd>
+                      </div>
+                      <div>
+                        <dt>主要风险</dt>
+                        <dd>{asset.risks}</dd>
+                      </div>
+                      <div>
+                        <dt>适用场景</dt>
+                        <dd>{asset.suitableFor}</dd>
+                      </div>
+                    </dl>
+                    <p>{asset.warning}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="finance-course-section" aria-label="资产配置系统">
+              <div className="finance-section-header finance-section-header-split">
+                <div>
+                  <span>{allocationSystem.eyebrow}</span>
+                  <h2>{allocationSystem.title}</h2>
+                </div>
+                <p>{allocationSystem.lead}</p>
+              </div>
+
+              <div className="finance-principle-grid finance-principle-grid-tight">
+                {allocationSystem.principles.map(item => (
+                  <article className="finance-principle-card" key={item}>
+                    <p>{item}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="finance-allocation-layout">
+                <div className="finance-numbered-panel">
+                  <h3>核心动作</h3>
+                  <ol>
+                    {allocationSystem.steps.map(step => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div className="finance-portfolio-grid">
+                  {allocationSystem.examplePortfolios.map(portfolio => (
+                    <article className="finance-portfolio-card" key={portfolio.name}>
+                      <span>{portfolio.name}</span>
+                      <h3>{portfolio.ratio}</h3>
+                      <p>{portfolio.fit}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div className="finance-rule-list" aria-label="再平衡规则">
+                <h3>再平衡规则</h3>
+                <ul>
+                  {allocationSystem.rebalanceRules.map(rule => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </div>
+              <p className="finance-section-note">{allocationSystem.disclaimer}</p>
+            </section>
+
+            <section className="finance-course-section" aria-label="长期价值投资者画像">
+              <div className="finance-section-header">
+                <span>{investorProfile.eyebrow}</span>
+                <h2>{investorProfile.title}</h2>
+                <p>{investorProfile.lead}</p>
+              </div>
+              <div className="finance-profile-grid">
+                <FinanceListCard title="服务谁" items={investorProfile.forWhom} />
+                <FinanceListCard title="不适合谁" items={investorProfile.notForWhom} />
+                <FinanceListCard title="本课程不教什么" items={investorProfile.courseDoesNotTeach} featured />
+              </div>
+            </section>
+
+            <section className="finance-course-section" aria-label="金钱心理学与个人操作系统">
+              <div className="finance-section-header finance-section-header-split">
+                <div>
+                  <span>{psychologySystem.eyebrow}</span>
+                  <h2>{psychologySystem.title}</h2>
+                </div>
+                <p>{psychologySystem.lead}</p>
+              </div>
+              <div className="finance-psychology-layout">
+                <div className="finance-rule-list">
+                  <h3>核心观念</h3>
+                  <ul>
+                    {psychologySystem.coreIdeas.map(item => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="finance-question-panel">
+                  <h3>写下你的个人原则</h3>
+                  <ol>
+                    {psychologySystem.personalQuestions.map(question => (
+                      <li key={question}>{question}</li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+              <div className="finance-behavior-row">
+                {psychologySystem.behaviorRules.map(rule => (
+                  <span key={rule}>{rule}</span>
+                ))}
+              </div>
+            </section>
+
+            <section className="finance-course-section" aria-label="风险管理">
+              <div className="finance-section-header">
+                <span>{riskManagement.eyebrow}</span>
+                <h2>{riskManagement.title}</h2>
+                <p>{riskManagement.lead}</p>
+              </div>
+              <div className="finance-risk-grid">
+                {riskManagement.riskTypes.map(risk => (
+                  <article className="finance-risk-card" key={risk.name}>
+                    <h3>{risk.name}</h3>
+                    <p>{risk.body}</p>
+                  </article>
+                ))}
+              </div>
+              <div className="finance-risk-bottom">
+                <FinanceListCard title="生存规则" items={riskManagement.survivalRules} />
+                <FinanceListCard title="危险信号" items={riskManagement.redFlags} featured />
+              </div>
+            </section>
+
+            <section className="finance-course-section" aria-label="三阶段路径">
+              <div className="finance-section-header">
+                <span>PHASES</span>
+                <h2>三阶段路径</h2>
+                <p>认知、持有和健康是这个财富框架的三条底层主线。先把基础系统搭稳，再谈具体工具。</p>
+              </div>
+              <div className="finance-step-grid">
+                {phases.map((step, index) => {
+                  const isStockStep = index === 1
+                  const isHealthStep = index === 2
+                  const target = isStockStep ? '/finance/stocks' : isHealthStep ? '/health' : null
+                  const clickableClass = target ? 'finance-step-link' : ''
+                  const goldClass = isStockStep ? 'finance-step-link-gold' : ''
+
+                  return (
+                    <section
+                      className={`finance-step ${clickableClass} ${goldClass}`}
+                      key={step.number}
+                      role={target ? 'button' : undefined}
+                      tabIndex={target ? 0 : undefined}
+                      aria-label={target ? `进入 ${step.title} 详情页` : undefined}
+                      onClick={target ? () => navigate(target) : undefined}
+                      onKeyDown={target ? e => (e.key === 'Enter' || e.key === ' ') && navigate(target) : undefined}
+                    >
+                      <div className="finance-step-index">{step.number}</div>
+                      <div className="finance-step-copy">
+                        <h2>{step.title}</h2>
+                        <p>{step.body}</p>
+                      </div>
+                      {target && <FinanceArrow />}
+                    </section>
+                  )
+                })}
+              </div>
+            </section>
+
+            <section className="finance-basics" aria-label="金融常识">
+              <div className="finance-basics-header">
+                <span>FINANCE BASICS</span>
+                <h2>金融常识：先算清代价，再谈拥有</h2>
+                <p>
+                  房、车和投资不是单纯的“该不该”，而是现金流、风险和机会成本的权衡。做决定前，先把隐性成本写出来。
+                </p>
+              </div>
+              <div className="finance-basic-grid">
+                {financeBasics.map(item => (
+                  <article className="finance-basic-card" key={item.title}>
+                    <div className="finance-basic-mark">{item.mark}</div>
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="finance-course-section finance-books-section" aria-label="推荐书摘">
+              <div className="finance-section-header">
+                <span>BOOK NOTES</span>
+                <h2>书摘入口：从《金钱心理学》开始</h2>
+                <p>书摘模块继续保留。优先理解行为、耐心和风险，再进入资产工具与价值投资框架。</p>
+              </div>
               <div className="finance-books" aria-label="推荐书单">
-                {BOOKS.map((book, index) => (
+                {books.map((book, index) => (
                   <article
                     key={book.title}
-                    className="finance-book finance-book-link"
+                    className={`finance-book finance-book-link ${book.slug === 'money-psychology' ? 'finance-book-emphasis' : ''}`}
                     role="button"
                     tabIndex={0}
                     aria-label={`进入 ${book.title} 书摘页`}
@@ -284,83 +469,58 @@ export default function FinancePage() {
                         <span>{book.coverAuthor}</span>
                       </div>
                     </div>
+                    <p className="finance-book-spotlight">{book.spotlight}</p>
                     <div className="finance-book-link-hint" aria-hidden="true">读书摘 →</div>
                   </article>
                 ))}
               </div>
             </section>
 
-            <div className="finance-step-grid">
-              {/* 第二步：点击进入股市讲解页 */}
-              <section
-                className="finance-step finance-step-link finance-step-link-gold"
-                role="button"
-                tabIndex={0}
-                aria-label="进入股市长期持有讲解页"
-                onClick={() => navigate('/finance/stocks')}
-                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/finance/stocks')}
-              >
-                <div className="finance-step-index">{STEPS[1].number}</div>
-                <div className="finance-step-copy">
-                  <h2>{STEPS[1].title}</h2>
-                  <p>{STEPS[1].body}</p>
-                </div>
-                <div className="finance-step-link-arrow" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2.5"
-                    strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </div>
-              </section>
-
-              {/* 第三步：点击跳转到健康页 */}
-              <section
-                className="finance-step finance-step-link"
-                role="button"
-                tabIndex={0}
-                aria-label="进入保持身体健康详情页"
-                onClick={() => navigate('/health')}
-                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/health')}
-              >
-                <div className="finance-step-index">{STEPS[2].number}</div>
-                <div className="finance-step-copy">
-                  <h2>{STEPS[2].title}</h2>
-                  <p>{STEPS[2].body}</p>
-                </div>
-                <div className="finance-step-link-arrow" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2.5"
-                    strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </div>
-              </section>
-            </div>
-
-            <section className="finance-basics" aria-label="金融常识">
-              <div className="finance-basics-header">
-                <span>FINANCE BASICS</span>
-                <h2>金融常识：先算清代价，再谈拥有</h2>
-                <p>
-                  房、车和投资不是单纯的“该不该”，而是现金流、风险和机会成本的权衡。做决定前，先把隐性成本写出来。
-                </p>
+            <section className="finance-course-section finance-closing-section" aria-label="最终宣言">
+              <div className="finance-section-header">
+                <span>{closing.eyebrow}</span>
+                <h2>{closing.title}</h2>
+                <p>{closing.body}</p>
               </div>
-              <div className="finance-basic-grid">
-                {FINANCE_BASICS.map(item => (
-                  <article className="finance-basic-card" key={item.title}>
-                    <div className="finance-basic-mark">{item.mark}</div>
-                    <h3>{item.title}</h3>
-                    <p>{item.body}</p>
+              <div className="finance-principle-grid">
+                {closing.principles.map(item => (
+                  <article className="finance-principle-card" key={item}>
+                    <p>{item}</p>
                   </article>
                 ))}
               </div>
+              <p className="finance-section-note">{closing.disclaimer}</p>
             </section>
           </main>
         </div>
       </div>
 
       <FinancePageDots count={PAGES} active={page} onSelect={goTo} />
+    </div>
+  )
+}
+
+function FinanceListCard({ title, items, featured = false }) {
+  return (
+    <article className={`finance-list-card ${featured ? 'finance-list-card-featured' : ''}`}>
+      <h3>{title}</h3>
+      <ul>
+        {items.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </article>
+  )
+}
+
+function FinanceArrow() {
+  return (
+    <div className="finance-step-link-arrow" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2.5"
+        strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
     </div>
   )
 }

@@ -1,7 +1,8 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import StepController, { useStepController } from '../StepController'
 import { Toolbar, ToolbarBtn, Legend } from './shared'
 import { useIsPhone } from '../../hooks/useMediaQuery'
+import { useAIPlaygroundTelemetry } from '../ai-playgrounds/AIPlaygroundTelemetryContext'
 
 // ─────────────────────────────────────────────────────────────
 // PlaygroundShell · 模板方法（Template Method）
@@ -52,6 +53,9 @@ export default function PlaygroundShell({
   const activePreset = presets.find(p => p.id === presetId) || presets[0]
   const isPhone = useIsPhone()
 
+  const stateRef = useRef(state)
+  stateRef.current = state
+
   const payload = stateful
     ? (derivePayload ? derivePayload(state) : state)
     : activePreset
@@ -60,15 +64,28 @@ export default function PlaygroundShell({
   const steps = useMemo(() => computeSteps(payload), [computeSteps, payload])
   const ctrl = useStepController(steps)
   const current = steps[ctrl.step]
+  const reportAIPlaygroundStep = useAIPlaygroundTelemetry()
+
+  useEffect(() => {
+    if (!reportAIPlaygroundStep || !current) return
+    reportAIPlaygroundStep({
+      current,
+      currentStep: ctrl.step,
+      total: steps.length,
+      presetId,
+      state,
+      payload,
+    })
+  }, [reportAIPlaygroundStep, current, ctrl.step, steps.length, presetId, state, payload])
 
   const selectPreset = useCallback((p) => {
     setPresetId(p.id)
     if (stateful) {
-      const patch = typeof p.state === 'function' ? p.state(state) : p.state
+      const patch = typeof p.state === 'function' ? p.state(stateRef.current) : p.state
       if (patch) setState(prev => ({ ...prev, ...patch }))
     }
     ctrl.reset()
-  }, [stateful, state, ctrl])
+  }, [stateful, ctrl])
 
   const renderedExtraToolbar = typeof extraToolbar === 'function'
     ? extraToolbar({ state, setState, ctrl })
