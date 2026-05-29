@@ -119,7 +119,7 @@ export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpe
         )}
 
         {/* iPad Dock 中央：主导航 */}
-        <nav ref={navRef} className="topbar-nav" style={{ position: 'relative', display: 'flex', gap: 2, flexWrap: 'nowrap', whiteSpace: 'nowrap', minWidth: 0 }}>
+        <nav ref={navRef} className="topbar-nav" style={{ position: 'relative', display: 'flex', gap: 2, flex: '1 1 auto', flexWrap: 'nowrap', whiteSpace: 'nowrap', minWidth: 0 }}>
           {NAV_ITEMS.map(item => (
             <NavLink key={item.id} id={item.id} to={item.to} active={item.id === activeNavId} icon={item.icon}>{item.label}</NavLink>
           ))}
@@ -149,7 +149,7 @@ export default function TopBar({ showMenuButton = false, onMenuClick, sidebarOpe
         </nav>
 
         {/* Dock 右段：搜索 / 主题 / 用户 / GitHub */}
-        <div className="topbar-actions" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexShrink: 1 }}>
+        <div className="topbar-actions" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: '0 1 auto' }}>
           <SearchBox onClick={() => setSearchOpen(true)} />
           <IslandDivider />
           <ThemeToggle />
@@ -358,6 +358,7 @@ function NavLink({ id, to, active, icon, children }) {
     <Link
       to={to}
       data-nav-id={id}
+      data-active={active ? 'true' : 'false'}
       title={typeof children === 'string' ? children : undefined}
       style={{
         position: 'relative',
@@ -371,7 +372,9 @@ function NavLink({ id, to, active, icon, children }) {
         color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
         background: 'transparent',
         whiteSpace: 'nowrap',          // 整条链接不换行
-        flexShrink: 0,                 // 父级压缩时不收缩
+        minWidth: active ? 'max-content' : 0,
+        overflow: active ? 'visible' : 'hidden',
+        flexShrink: active ? 0 : 1,
         transition: 'color 0.24s ease, font-weight 0.24s ease',
       }}
       onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'var(--text-primary)' }}
@@ -402,8 +405,8 @@ function SearchBox({ onClick }) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-tertiary)' }}>
         <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
       </svg>
-      <span className="topbar-search-label" style={{ flex: 1, color: 'var(--text-tertiary)' }}>搜索算法、指南、项目...</span>
-      <kbd className="topbar-search-kbd" style={kbdStyle}>{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+      <span className="topbar-search-label" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-tertiary)' }}>搜索算法、指南、项目...</span>
+      <kbd className="topbar-search-kbd" style={{ ...kbdStyle, flexShrink: 0 }}>{isMac ? '⌘K' : 'Ctrl K'}</kbd>
     </button>
   )
 }
@@ -494,9 +497,11 @@ const searchBoxStyle = {
   WebkitBackdropFilter: 'var(--glass-blur)',
   border: '1px solid var(--glass-border)',
   boxShadow: 'var(--glass-shine)',
-  width: 'clamp(180px, 20vw, 280px)',
-  minWidth: 36,
+  width: 'clamp(44px, 18vw, 280px)',
+  maxWidth: 280,
+  minWidth: 44,
   flexShrink: 1,
+  overflow: 'hidden',
   fontSize: 12.5,
   textAlign: 'left',
   transition: 'all 0.18s',
