@@ -1179,6 +1179,20 @@
     linear-gradient(160deg, rgba(74, 112, 151, 0.66), rgba(24, 46, 78, 0.94));
 }
 
+.finance-book-cover-teal {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.16), transparent 34%, rgba(0, 0, 0, 0.10) 100%),
+    radial-gradient(circle at 88% 16%, rgba(208, 255, 239, 0.20), transparent 30%),
+    linear-gradient(160deg, rgba(66, 185, 154, 0.60), rgba(14, 72, 62, 0.94));
+}
+
+.finance-book-cover-slate {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.16), transparent 34%, rgba(0, 0, 0, 0.10) 100%),
+    radial-gradient(circle at 88% 16%, rgba(232, 245, 242, 0.20), transparent 30%),
+    linear-gradient(160deg, rgba(138, 160, 160, 0.62), rgba(34, 55, 52, 0.94));
+}
+
 /* 可点击书籍卡 */
 .finance-book-link {
   cursor: pointer;
@@ -1368,6 +1382,16 @@
   margin-bottom: 26px;
 }
 
+@media (min-width: 1120px) {
+  .finance-why-section .finance-section-header {
+    max-width: 1120px;
+  }
+
+  .finance-why-section .finance-section-header p {
+    white-space: nowrap;
+  }
+}
+
 .finance-section-header-split {
   grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.9fr);
   max-width: none;
@@ -1485,9 +1509,16 @@
   gap: 12px;
 }
 
+.finance-asset-card-head span {
+  color: rgba(215, 181, 109, 0.92);
+  font-size: 15.5px;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+}
+
 .finance-asset-card-head strong {
   color: var(--finance-cream);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
   line-height: 1.25;
 }
@@ -5965,6 +5996,20 @@ input:focus, textarea:focus {
     linear-gradient(115deg, rgba(255, 255, 255, 0.26), transparent 34%, rgba(24, 46, 78, 0.08) 100%),
     radial-gradient(circle at 88% 16%, rgba(226, 239, 255, 0.34), transparent 30%),
     linear-gradient(160deg, rgba(73, 108, 161, 0.80), rgba(42, 66, 108, 0.94));
+}
+
+[data-theme="light"] .finance-book-cover-teal {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.26), transparent 34%, rgba(14, 72, 62, 0.08) 100%),
+    radial-gradient(circle at 88% 16%, rgba(220, 255, 243, 0.34), transparent 30%),
+    linear-gradient(160deg, rgba(61, 167, 139, 0.78), rgba(30, 102, 87, 0.94));
+}
+
+[data-theme="light"] .finance-book-cover-slate {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.26), transparent 34%, rgba(34, 55, 52, 0.08) 100%),
+    radial-gradient(circle at 88% 16%, rgba(232, 245, 242, 0.34), transparent 30%),
+    linear-gradient(160deg, rgba(122, 145, 145, 0.82), rgba(61, 82, 78, 0.94));
 }
 
 [data-theme="light"] .finance-backdrop::before {
