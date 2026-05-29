@@ -83,6 +83,7 @@ export default function AIPage() {
     if (!el) return
 
     const onWheel = (event) => {
+      if (event.ctrlKey || event.metaKey) return
       event.preventDefault()
       const now = Date.now()
       if (now - lastWheelRef.current > AI_GESTURE_GAP_MS) accumRef.current = 0
