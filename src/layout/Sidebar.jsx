@@ -5,8 +5,11 @@ import { preloadAlgorithmDetail } from '../data/algorithmDetails'
 import { useProgress } from '../contexts/ProgressContext'
 import { SUBJECT_LIST, getCategoriesBySubject } from '../data/subjects'
 import { preloadPlayground } from '../components/learning/playgroundRegistry'
+import { preloadRoute } from '../hooks/useRoutePreload'
 
 function preloadAlgorithm(algo) {
+  // 从 /compare 页 hover 时 AlgorithmPage chunk 可能还没加载,一并预热
+  preloadRoute('/algo')
   preloadAlgorithmDetail(algo.slug)
   preloadPlayground(algo.viz).catch(() => null)
 }

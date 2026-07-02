@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useViewport } from '../hooks/useMediaQuery'
+import { usePreloadHandlers } from '../hooks/useRoutePreload'
 import DynamicIsland, { IslandDivider } from './DynamicIsland'
 import { NAV_ITEMS } from './navItems'
 
@@ -360,6 +361,8 @@ function ThemeToggle() {
 
 function NavLink({ id, to, active, icon, children }) {
   // 参考图风格：图标 + 中文标签 + 活跃项底部紫色下划线
+  // hover/focus 时预热目标页面 chunk,点击导航即秒开
+  const preload = usePreloadHandlers(to)
   return (
     <Link
       to={to}
@@ -383,6 +386,7 @@ function NavLink({ id, to, active, icon, children }) {
         flexShrink: active ? 0 : 1,
         transition: 'color 0.24s ease, font-weight 0.24s ease',
       }}
+      {...preload}
       onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'var(--text-primary)' }}
       onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'var(--text-secondary)' }}
     >
