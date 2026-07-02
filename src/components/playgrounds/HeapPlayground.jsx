@@ -1,5 +1,6 @@
 import HeapViz from '../HeapViz'
 import PlaygroundShell from './PlaygroundShell'
+import { attachStableIds } from '../SortingViz'
 import { randomArray, ArrayTextInput } from './inputs/ArrayInput'
 
 const PRESETS = [
@@ -22,14 +23,15 @@ export default function HeapPlayground({ algoFn }) {
       initialState={{ arr: randomArray(10), text: '' }}
       presets={PRESETS}
       derivePayload={s => s.arr}
-      computeSteps={arr => algoFn(arr)}
+      // attachStableIds 标注元素身份 → 上浮/下沉时节点沿树边游动(见 HeapViz)
+      computeSteps={arr => attachStableIds(algoFn(arr))}
       extraToolbar={({ state, setState, ctrl }) => (
         <ArrayTextInput state={state} setState={setState} ctrl={ctrl}
           placeholder="3 1 6 5 2 4" positiveOnly={false} />
       )}
-      renderViz={({ current }) => (
+      renderViz={({ current, ctrl }) => (
         <>
-          <HeapViz stepData={current} />
+          <HeapViz stepData={current} speedMs={ctrl.speed} />
           <div style={{ height: 16 }} />
         </>
       )}
