@@ -1,4 +1,4 @@
-import SortingViz from '../SortingViz'
+import SortingViz, { attachStableIds } from '../SortingViz'
 import MergeSortViz from '../MergeSortViz'
 import QuickSortViz from '../QuickSortViz'
 import PlaygroundShell from './PlaygroundShell'
@@ -47,14 +47,15 @@ export default function SortingPlayground({ algoFn, algoSlug }) {
       initialState={{ arr: randomArray(startSize), text: '' }}
       presets={presets}
       derivePayload={s => s.arr}
-      computeSteps={arr => algoFn(arr)}
+      // attachStableIds 给每步标注元素身份 → 柱子滑动动画(见 SortingViz)
+      computeSteps={arr => attachStableIds(algoFn(arr))}
       extraToolbar={({ state, setState, ctrl }) => (
         <ArrayTextInput state={state} setState={setState} ctrl={ctrl}
           placeholder="自定义：5 3 8 1 9 2" />
       )}
-      renderViz={({ current, state }) => (
+      renderViz={({ current, state, ctrl }) => (
         <VizCard>
-          <VizComponent stepData={current} maxVal={Math.max(...state.arr)} />
+          <VizComponent stepData={current} maxVal={Math.max(...state.arr)} speedMs={ctrl.speed} />
         </VizCard>
       )}
       legend={legend}
