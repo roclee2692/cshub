@@ -1,5 +1,11 @@
 // AI 专业课 · 信息论与编码（it）章节课节数据
 // 由模块表 + buildInfoTheoryLesson 生成；从 curriculum.js 原样拆出（2026-06）。
+// 2026-07：课节内容改为直接取自算法库（algorithms/it.js 的小白化
+// intuition/伪代码/真实代码 + quizzes.js 的 3 题测验），单一数据源——
+// 此前 14 个课节共用同一段通用 entropy 代码和同一道通用测验。
+import IT_ALGORITHMS from '../../algorithms/it'
+import { QUIZZES } from '../../quizzes'
+
 const INFO_THEORY_MODULES = [
   ['it-selfinfo', '自信息与信息量', '概率越小，信息量越大', 'I(x) = -log2 p(x)', 'itFundamental'],
   ['it-entropy', '信息熵 Entropy', '离散分布的平均不确定性', 'H(X) = -Σ p(x) log2 p(x)', 'itFundamental'],
@@ -18,6 +24,7 @@ const INFO_THEORY_MODULES = [
 ]
 
 function buildInfoTheoryLesson([id, title, summary, formula, category]) {
+  const algo = IT_ALGORITHMS[id]
   return {
     id,
     title,
@@ -26,93 +33,45 @@ function buildInfoTheoryLesson([id, title, summary, formula, category]) {
     // 信息论课节复用算法库的公式/矩阵可视化（自带推导面板），
     // 教学焦点是公式高亮，通用 entropy 示例代码降级为折叠参考。
     displayMode: 'visualFirst',
-    theory: `## ${title}
-
-${summary}。
-
-### 核心公式
-
-$$${formula}$$
-
-本课节复用 CSHub 信息论可视化模块，左侧展示动画、公式或矩阵演算，右侧代码行随 step 同步高亮。`,
+    theory: buildTheory(title, formula, algo),
     exercise: { type: 'playground', viz: 'infoTheoryBridge' },
     variablesSnapshot: {
       concept: title,
       category,
       formula,
     },
-    pseudocode: `procedure INFORMATION_THEORY_STEP(input)
-    normalize probability model
-    select current derivation term
-    highlight formula line and probability cell
-    update partial result
-    return current visualization state`,
-    code: {
-      python: `import math
-
-def safe_log2(x):
-    return 0.0 if x <= 0 else math.log2(x)
-
-def entropy(probabilities):
-    total = 0.0
-    for p in probabilities:
-        if p > 0:
-            total += -p * safe_log2(p)
-    return total
-
-def information_theory_step(model):
-    probabilities = model.current_distribution()
-    value = entropy(probabilities)
-    return value`,
-      cpp: `#include <cmath>
-#include <vector>
-
-double safe_log2(double x) {
-    return x <= 0.0 ? 0.0 : std::log2(x);
-}
-
-double entropy(const std::vector<double>& probabilities) {
-    double total = 0.0;
-    for (double p : probabilities) {
-        if (p > 0.0) {
-            total += -p * safe_log2(p);
-        }
-    }
-    return total;
-}
-
-double informationTheoryStep(Model& model) {
-    auto probabilities = model.currentDistribution();
-    return entropy(probabilities);
-}`,
-    },
-    codeStepHighlightLines: {
-      python: [6, 7, 8, 9, 10, 13, 14, 15],
-      cpp: [8, 9, 10, 11, 12, 18, 19],
-    },
-    bigO: {
-      time: '公式类通常按概率项线性扫描；矩阵/概率表模块按表格大小或状态数逐步演示。',
-      space: '主要保存概率分布、矩阵、当前 step 和可视化状态，通常为 O(n) 到 O(n^2)。',
-      note: '实际复杂度以左侧具体信息论 playground 的 step 数据为准。',
-    },
+    // 伪代码/代码/测验直接取算法库同名条目（真实的按算法内容），
+    // codeStepHighlightLines 不再硬编码——completeAILessonMetadata
+    // 会按新代码自动推导默认高亮行。
+    pseudocode: algo?.pseudocode,
+    code: algo?.code,
+    bigO: algo ? {
+      time: `最好 ${algo.timeComplexity.best} / 平均 ${algo.timeComplexity.average} / 最坏 ${algo.timeComplexity.worst}`,
+      space: algo.spaceComplexity,
+      note: '以左侧信息论 playground 的 step 数据为演示口径。',
+    } : undefined,
     compare: [
       { method: '公式推导', data: '概率项和对数项', strength: '适合解释熵、互信息、KL 等概念', tradeoff: '需要逐行同步高亮' },
       { method: '矩阵/状态图', data: '转移矩阵和状态节点', strength: '适合信道、马尔可夫和编码过程', tradeoff: '需要保持单元格与动画同步' },
     ],
-    quiz: [
-      {
-        q: '信息论可视化中最重要的同步关系是什么？',
-        options: [
-          '当前动画 step 与公式行、矩阵单元格或代码行一致',
-          '只显示最终数值',
-          '隐藏概率模型',
-          '跳过中间推导',
-        ],
-        answer: 0,
-        explanation: '信息论教学的重点是让每一项概率、求和、对数和矩阵单元都能与动画步骤对应。',
-      },
-    ],
+    quiz: QUIZZES[id],
   }
+}
+
+// 课节正文 = 算法库的小白化讲解 + 核心公式;库里没有时退回原一行摘要
+function buildTheory(title, formula, algo) {
+  const intro = algo?.intuition
+    ? algo.intuition
+    : `${title}。`
+  return `## ${title}
+
+${intro}
+
+### 核心公式
+
+$$${formula}$$
+
+左侧动画展示公式或矩阵的逐步演算，右侧代码行随 step 同步高亮。`
 }
 
 export const INFO_THEORY_LESSONS = INFO_THEORY_MODULES.map(buildInfoTheoryLesson)
