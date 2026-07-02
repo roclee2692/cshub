@@ -330,21 +330,27 @@ function ThemeToggle() {
         e.currentTarget.style.color = 'var(--text-secondary)'
       }}
     >
+      {/* inset:0 让绝对定位 span 填满按钮容器，里面的 flex 居中才有可居中的盒子；
+          否则 span 塌缩到左上角，居中失效（图标会偏到按钮左上角）。 */}
       <span style={{
         position: 'absolute',
+        inset: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s',
         transform: isDark ? 'translateY(0)' : 'translateY(-34px)',
         opacity: isDark ? 1 : 0,
+        pointerEvents: 'none',
       }}>
         <SunIcon />
       </span>
       <span style={{
         position: 'absolute',
+        inset: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s',
         transform: !isDark ? 'translateY(0)' : 'translateY(34px)',
         opacity: !isDark ? 1 : 0,
+        pointerEvents: 'none',
       }}>
         <MoonIcon />
       </span>
@@ -442,10 +448,21 @@ function Logo() {
 }
 
 function SunIcon() {
+  // lucide "sun" 标准 8 射线版本。原先把所有 path 串在一行用相对偏移写，
+  // 左上角那条相对位移算错了（应当是 m-7.07-17.07，写成 m-7.07-14.07
+  // 导致射线被下移 3px），视觉上像左上角缺了一角。
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="-1 -1 26 26" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2m-4.93-7.07-1.41 1.41M6.34 17.66l-1.41 1.41" />
+      <line x1="12" y1="2" x2="12" y2="4" />
+      <line x1="12" y1="20" x2="12" y2="22" />
+      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" />
+      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" />
+      <line x1="2" y1="12" x2="4" y2="12" />
+      <line x1="20" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" />
+      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" />
     </svg>
   )
 }

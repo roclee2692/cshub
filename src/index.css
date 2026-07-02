@@ -2670,6 +2670,34 @@
   }
 }
 
+/* ── 手机端「独立思考 / 明辨是非」hero 字号收紧，避免横向溢出 ──
+   每行 4 字 + 字间距 0.12em + flex gap，需要：字号 ≤ (vw - 内边距) / (4 字宽度因子)
+   例：375px 屏宽时，4 × 48px × 1.12 + 3 × 14px ≈ 257px，落在 320px 安全区内。 */
+@media (max-width: 480px) {
+  .logic-hero-title {
+    font-size: clamp(40px, 12.5vw, 60px);
+    letter-spacing: 0.04em;
+    gap: 14px;
+    width: 100%;
+  }
+  .logic-title-line {
+    gap: clamp(10px, 3vw, 18px);
+    justify-content: center;
+  }
+  .logic-poster-hero {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .logic-hero-caption {
+    margin-top: 18px;
+    width: 100%;
+  }
+  .logic-caption-en {
+    font-size: 13px;
+    padding: 0 8px;
+  }
+}
+
 @media (max-width: 768px) {
 }
 
@@ -3939,6 +3967,26 @@ input:focus, textarea:focus {
   .gp-section-header { flex-direction: column; gap: 14px; }
   .gp-bubble, .gp-sticky { display: none; }
   .gp-deco { display: none; }
+}
+
+/* 手机端：「内心充盈者，独行也如众」共 11 字 + 1 个全角逗号，
+   100px 字号下宽度 ≈ 1200px 必溢屏。改成分两行 + 收紧字号即可。 */
+@media (max-width: 480px) {
+  .gp-hero { padding: 36px 16px 28px; }
+  .gp-title {
+    font-size: clamp(32px, 9.5vw, 44px);
+    line-height: 1.2;
+    /* 让长标题在符号或空格处自然换行 */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .gp-title-highlight {
+    /* 「内心充盈者，」单独成块 + 后续换行，视觉更平衡 */
+    display: block;
+    margin-bottom: 4px;
+  }
+  .gp-underline-svg  { width: min(360px, 80vw); }
+  .gp-underline-svg2 { width: min(200px, 50vw); }
 }
 
 /* ── Theme Transitions for Personal Growth elements ── */
@@ -5624,6 +5672,22 @@ input:focus, textarea:focus {
   .topbar-search-label {
     display: none !important;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   📱 Phase 3.5 · iPad 横屏 / 小桌面补丁 (1025 - 1279px)
+   iPad Air 横屏 (1180px) 与 iPad Pro 11" 横屏 (1194px) 落在这一区间：
+   - 不再走 ≤1024 的"iPad 紧凑模式"（侧栏/页面 padding 仍要保留桌面感）
+   - 但 TopBar 在这一档宽度上挤不下「6 主导航 + 280px 搜索 + GitHub 按钮（含文字）」
+   - 解决：把 GitHub 按钮改成只显示图标，搜索框略缩，让所有元素都能落入岛内
+   ───────────────────────────────────────────────────────────── */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  /* GitHub 按钮：只保留 Octocat 图标，节约 ~60px */
+  .topbar-github       { padding: 7px 10px !important; }
+  .topbar-github span  { display: none !important; }
+
+  /* 搜索框：从 280px 收到 220px，⌘K 提示仍保留（鼠标键盘场景） */
+  .topbar-search       { width: 220px !important; }
 }
 
 /* ─────────────────────────────────────────────────────────────

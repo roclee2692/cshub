@@ -100,6 +100,52 @@ export default function AppLayout() {
         </Link>
       )}
 
+      {/* 手机端「算法目录」浮动按钮：算法页/对比页才显示，点击打开 Sidebar 抽屉。
+          桌面/iPad 已经有常驻 Sidebar + RailToggle，所以这个 FAB 只在 isPhone 时渲染。
+          位置：右下角、底部导航之上 12px，避开 WeChat/Safari 顶栏与页面内容。 */}
+      {isPhone && isAlgo && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="打开算法目录"
+          className="mobile-algo-dir-fab"
+          style={{
+            position: 'fixed',
+            right: 14,
+            bottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 14px)',
+            zIndex: 70,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 7,
+            height: 44,
+            padding: '0 16px',
+            borderRadius: 999,
+            border: '1px solid var(--accent-border)',
+            background: 'var(--accent-soft)',
+            backdropFilter: 'blur(18px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(18px) saturate(180%)',
+            color: 'var(--accent-light)',
+            fontSize: 13,
+            fontWeight: 800,
+            letterSpacing: '0.02em',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.18), 0 0 18px var(--accent-soft)',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+          <span>算法目录</span>
+        </button>
+      )}
+
       <div style={{ display: 'flex', flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
         {showGlobalSidebarInline && (
           <div style={{
