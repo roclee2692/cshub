@@ -12,6 +12,13 @@ const SPEED_PRESETS = [
   { label: '8×',   ms: 125  },
 ]
 
+// ── 键盘快捷键作用域(审计 #6)──────────────────────────────
+// 对比页(/compare)同时挂载两个 StepController,若都响应 window 级
+// 快捷键,一次空格会同时驱动两个动画。模块级"活跃实例"登记:
+// 最后挂载或最后被点击的控制器持有快捷键,其余实例忽略按键。
+// 单实例页面不受影响(唯一实例恒为活跃)。
+let activeControllerId = null
+
 export function useStepController(steps) {
   const [step, setStep] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -63,12 +70,25 @@ export default function StepController({
   const isDragging = useRef(false)
   const isPhone = useIsPhone()
 
-  // Keyboard shortcuts — 由 useKeydown 自动处理 input 焦点过滤和清理
+  // 活跃实例登记:挂载即认领;卸载时若仍是自己则释放
+  const idRef = useRef(null)
+  if (!idRef.current) idRef.current = Symbol('step-controller')
+  useEffect(() => {
+    activeControllerId = idRef.current
+    return () => {
+      if (activeControllerId === idRef.current) activeControllerId = null
+    }
+  }, [])
+  const claim = () => { activeControllerId = idRef.current }
+  const isActive = () => activeControllerId === null || activeControllerId === idRef.current
+
+  // Keyboard shortcuts — 由 useKeydown 自动处理 input 焦点过滤和清理;
+  // 仅活跃实例响应(多 playground 页面一次按键只驱动一个动画)
   useKeydown({
-    Space:      (e) => { e.preventDefault(); playing ? stop() : play() },
-    ArrowLeft:  (e) => { e.preventDefault(); prev() },
-    ArrowRight: (e) => { e.preventDefault(); goNext() },
-    KeyR:       (e) => { e.preventDefault(); reset() },
+    Space:      (e) => { if (!isActive()) return; e.preventDefault(); playing ? stop() : play() },
+    ArrowLeft:  (e) => { if (!isActive()) return; e.preventDefault(); prev() },
+    ArrowRight: (e) => { if (!isActive()) return; e.preventDefault(); goNext() },
+    KeyR:       (e) => { if (!isActive()) return; e.preventDefault(); reset() },
   })
 
   function posToStep(clientX) {
@@ -97,7 +117,7 @@ export default function StepController({
 
   const progress = total > 1 ? step / (total - 1) : 0
   return (
-    <div style={{
+    <div onPointerDown={claim} style={{
       background: 'var(--glass-bg)',
       backdropFilter: 'var(--glass-blur)',
       WebkitBackdropFilter: 'var(--glass-blur)',
