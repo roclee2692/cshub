@@ -33,7 +33,7 @@ const sync = createSyncService({
 
 function applyRealtimePatch(prev, patch) {
   if (patch.progress) {
-    const { slug, favorited, completed } = patch.progress
+    const { slug, favorited, completed, at } = patch.progress
     const favorites = new Set(prev.favorites)
     const completedSet = new Set(prev.completed)
     if (patch.event === 'DELETE') {
@@ -43,7 +43,9 @@ function applyRealtimePatch(prev, patch) {
       favorited ? favorites.add(slug) : favorites.delete(slug)
       completed ? completedSet.add(slug) : completedSet.delete(slug)
     }
-    return { ...prev, favorites, completed: completedSet }
+    // 记下远端时间戳：本设备后续 LWW 合并时不会用旧状态盖掉这次远端变更
+    const progressMeta = { ...prev.progressMeta, [slug]: at || Date.now() }
+    return { ...prev, favorites, completed: completedSet, progressMeta }
   }
   if (patch.quiz) {
     const { slug, ...score } = patch.quiz
@@ -123,11 +125,13 @@ export function ProgressProvider({ children }) {
         const favorites = new Set(prev.favorites)
         const has = favorites.has(slug)
         has ? favorites.delete(slug) : favorites.add(slug)
+        const at = Date.now()  // LWW 时间戳：让"取消收藏"能跨设备传播
         sync.enqueueProgress(slug, {
           favorited: !has,
           completed: prev.completed.has(slug),
+          at,
         })
-        return { ...prev, favorites }
+        return { ...prev, favorites, progressMeta: { ...prev.progressMeta, [slug]: at } }
       })
     },
     toggleCompleted(slug) {
@@ -135,11 +139,13 @@ export function ProgressProvider({ children }) {
         const completed = new Set(prev.completed)
         const has = completed.has(slug)
         has ? completed.delete(slug) : completed.add(slug)
+        const at = Date.now()
         sync.enqueueProgress(slug, {
           completed: !has,
           favorited: prev.favorites.has(slug),
+          at,
         })
-        return { ...prev, completed }
+        return { ...prev, completed, progressMeta: { ...prev.progressMeta, [slug]: at } }
       })
     },
     recordQuiz(slug, correct, total) {
@@ -157,7 +163,7 @@ export function ProgressProvider({ children }) {
       })
     },
     async clearAll() {
-      store.setState(() => ({ favorites: new Set(), completed: new Set(), quizScores: {} }))
+      store.setState(() => ({ favorites: new Set(), completed: new Set(), quizScores: {}, progressMeta: {} }))
       await sync.clearAll()
     },
   }), [store])
