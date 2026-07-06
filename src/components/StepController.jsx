@@ -61,7 +61,14 @@ export default function StepController({
 }) {
   const scrubberRef = useRef(null)
   const isDragging = useRef(false)
+  // 拖拽期间挂在 window 上的监听器的卸载函数；组件若在拖拽中途 unmount，
+  // 由下面的 useEffect cleanup 兜底移除，避免监听器泄漏。
+  const detachDragListeners = useRef(null)
   const isPhone = useIsPhone()
+
+  useEffect(() => {
+    return () => { detachDragListeners.current?.() }
+  }, [])
 
   // Keyboard shortcuts — 由 useKeydown 自动处理 input 焦点过滤和清理
   useKeydown({
@@ -82,14 +89,18 @@ export default function StepController({
     seek(posToStep(e.clientX))
     window.addEventListener('mousemove', handleScrubberMouseMove)
     window.addEventListener('mouseup', handleScrubberMouseUp)
+    detachDragListeners.current = () => {
+      window.removeEventListener('mousemove', handleScrubberMouseMove)
+      window.removeEventListener('mouseup', handleScrubberMouseUp)
+      detachDragListeners.current = null
+    }
   }
   function handleScrubberMouseMove(e) {
     if (isDragging.current) seek(posToStep(e.clientX))
   }
   function handleScrubberMouseUp() {
     isDragging.current = false
-    window.removeEventListener('mousemove', handleScrubberMouseMove)
-    window.removeEventListener('mouseup', handleScrubberMouseUp)
+    detachDragListeners.current?.()
   }
   function handleScrubberTouch(e) {
     seek(posToStep(e.touches[0].clientX))

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import ErrorBoundary from '../components/ErrorBoundary'
 import { AI_CURRICULUM, AI_LESSON_ALIASES, AI_LESSON_MAP, AI_TOTAL_LESSONS } from '../data/ai/curriculum'
 import { useCourseProgress } from '../features/music/hooks/useCourseProgress'
 import LessonViewer from '../features/music/components/LessonViewer'
@@ -11,9 +12,18 @@ const AIPlaygroundFor = lazy(() => import('../components/ai-playgrounds/AIPlaygr
 function AIExercise({ exercise, lesson, onSnapshotChange }) {
   if (!exercise || exercise.type !== 'playground') return null
   return (
-    <Suspense fallback={<div className="h-64 bg-surface rounded-lg animate-pulse" />}>
-      <AIPlaygroundFor viz={exercise.viz} lesson={lesson} onSnapshotChange={onSnapshotChange} />
-    </Suspense>
+    <ErrorBoundary fallback={
+      <div className="rounded-xl border border-border-soft bg-surface p-6 text-left">
+        <div className="text-[10px] font-bold tracking-widest uppercase text-fg-faint mb-2">
+          可视化加载失败
+        </div>
+        <p className="text-sm text-fg-muted">该交互模块暂时不可用，课程内容不受影响，请刷新页面重试。</p>
+      </div>
+    }>
+      <Suspense fallback={<div className="h-64 bg-surface rounded-lg animate-pulse" />}>
+        <AIPlaygroundFor viz={exercise.viz} lesson={lesson} onSnapshotChange={onSnapshotChange} />
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 
@@ -37,7 +47,7 @@ export default function AILessonPage() {
   const handlePlaygroundSnapshot = useCallback((snapshot) => {
     const current = snapshot?.current || {}
     const key = JSON.stringify({
-      lessonId,
+      lessonId: canonicalLessonId,
       presetId: snapshot?.presetId,
       currentStep: snapshot?.currentStep,
       total: snapshot?.total,
@@ -49,7 +59,7 @@ export default function AILessonPage() {
     if (snapshotKeyRef.current === key) return
     snapshotKeyRef.current = key
     setPlaygroundSnapshot(snapshot)
-  }, [lessonId])
+  }, [canonicalLessonId])
 
   if (canonicalLessonId !== lessonId && lesson) {
     return <Navigate to={`/ai-course/lesson/${canonicalLessonId}`} replace />
