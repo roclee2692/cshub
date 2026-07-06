@@ -33,9 +33,17 @@ export async function fetchProgress(userId) {
   }
   const favorites = new Set()
   const completed = new Set()
+  // rows 保留每行完整状态 + updated_at 时间戳，供 SyncService 做 LWW 合并
+  // （favorited=false 的行本身就是"取消收藏"的证据，不能丢）
+  const rows = {}
   for (const row of progRes.data || []) {
     if (row.favorited) favorites.add(row.slug)
     if (row.completed) completed.add(row.slug)
+    rows[row.slug] = {
+      favorited: !!row.favorited,
+      completed: !!row.completed,
+      at: row.updated_at ? new Date(row.updated_at).getTime() : 0,
+    }
   }
   const quizScores = {}
   for (const row of quizRes.data || []) {
@@ -46,7 +54,7 @@ export async function fetchProgress(userId) {
       lastAt: row.last_at ? new Date(row.last_at).getTime() : 0,
     }
   }
-  return { favorites, completed, quizScores }
+  return { favorites, completed, quizScores, rows }
 }
 
 export async function pushProgressRow(userId, slug, payload) {
@@ -57,7 +65,9 @@ export async function pushProgressRow(userId, slug, payload) {
     slug,
     completed: payload.completed,
     favorited: payload.favorited,
-    updated_at: new Date().toISOString(),
+    // LWW：updated_at 用真实修改时刻（payload.at），而非推送时刻——
+    // 防抖/重试的延迟不应改变"谁更新"的裁决
+    updated_at: new Date(payload.at || Date.now()).toISOString(),
   }, { onConflict: 'user_id,slug' })
 }
 
@@ -99,7 +109,12 @@ export function subscribeRealtime(userId, handler) {
           const row = payload.new || payload.old
           if (!row?.slug) return
           handler({
-            progress: { slug: row.slug, favorited: row.favorited, completed: row.completed },
+            progress: {
+              slug: row.slug,
+              favorited: row.favorited,
+              completed: row.completed,
+              at: row.updated_at ? new Date(row.updated_at).getTime() : Date.now(),
+            },
             event: payload.eventType === 'DELETE' ? 'DELETE' : 'UPSERT',
           })
         })

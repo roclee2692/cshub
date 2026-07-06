@@ -1,9 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CS Hub · 计算机专业开放学习平台：86+ 算法交互可视化、AI 专业课、信息论、操作系统与计算机网络,零基础也能看懂的分步动画讲解。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CS Hub · 算法可视化学习平台" />
+    <meta property="og:description" content="86+ 算法交互可视化、AI 专业课、分步动画讲解——零基础也能看懂。" />
+    <meta property="og:locale" content="zh_CN" />
     <script>
       ;(() => {
         try {
@@ -19,13 +24,22 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- display=swap:装饰性手写体加载期间先用系统字体渲染(FOUT),
+         避免 display=block 的隐形文字阻塞期;media="print"+onload 异步加载
+         CSS 与之互补(解决请求阻塞渲染),noscript 兜底无 JS 环境。 -->
     <link
-      href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Caveat:wght@600;700&display=block"
+      href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Caveat:wght@600;700&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
-    <title>algo-viz</title>
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Caveat:wght@600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    <title>CS Hub · 算法可视化学习平台</title>
   </head>
   <body>
     <div id="root"></div>

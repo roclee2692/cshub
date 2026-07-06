@@ -1,52 +1,74 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import AppLayout from './layout/AppLayout'
 import ErrorBoundary from './components/ErrorBoundary'
+import PageSkeleton from './components/PageSkeleton'
+import { ROUTE_LOADERS, NOT_FOUND_LOADER } from './routeLoaders'
 
-const HomePage = lazy(() => import('./pages/HomePage'))
-const AlgorithmPage = lazy(() => import('./pages/AlgorithmPage'))
-const ProfilePage = lazy(() => import('./pages/ProfilePage'))
-const PathPage = lazy(() => import('./pages/PathPage'))
-const LearningCenterPage = lazy(() => import('./pages/LearningCenterPage'))
-const LogicPage = lazy(() => import('./pages/LogicPage'))
-const AlgorithmComparePage = lazy(() => import('./pages/AlgorithmComparePage'))
-const GitHubGuidePage = lazy(() => import('./pages/GitHubGuidePage'))
-const AIGuidePage = lazy(() => import('./pages/AIGuidePage'))
-const FinancePage = lazy(() => import('./pages/FinancePage'))
-const StockMarketPage = lazy(() => import('./pages/StockMarketPage'))
-const InterviewGuidePage = lazy(() => import('./pages/InterviewGuidePage'))
-const RoadmapPage = lazy(() => import('./pages/RoadmapPage'))
-const ToolboxPage = lazy(() => import('./pages/ToolboxPage'))
-const ProjectsGuidePage = lazy(() => import('./pages/ProjectsGuidePage'))
-const SetupGuidePage = lazy(() => import('./pages/SetupGuidePage'))
-const PersonalGrowthPage = lazy(() => import('./pages/PersonalGrowthPage'))
-const HealthPage = lazy(() => import('./pages/HealthPage'))
-const BookNotesPage = lazy(() => import('./pages/BookNotesPage'))
-const PianoPage = lazy(() => import('./pages/PianoPage'))
-const PianoLessonPage = lazy(() => import('./pages/PianoLessonPage'))
-const PianoPracticePage = lazy(() => import('./pages/PianoPracticePage'))
-const PianoPlaygroundPage = lazy(() => import('./pages/PianoPlaygroundPage'))
-const GuitarPage = lazy(() => import('./pages/GuitarPage'))
-const GuitarLessonPage = lazy(() => import('./pages/GuitarLessonPage'))
-const ViolinPage = lazy(() => import('./pages/ViolinPage'))
-const ViolinLessonPage = lazy(() => import('./pages/ViolinLessonPage'))
-const AIPage = lazy(() => import('./pages/AIPage'))
-const AILessonPage = lazy(() => import('./pages/AILessonPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+// lazy 工厂统一收敛到 routeLoaders.js(同时供 hover 预热使用,
+// 同一路径的 import() 命中同一模块缓存,预热与 lazy 共享请求)
+const HomePage = lazy(ROUTE_LOADERS['/'])
+const AlgorithmPage = lazy(ROUTE_LOADERS['/algo'])
+const ProfilePage = lazy(ROUTE_LOADERS['/profile'])
+const PathPage = lazy(ROUTE_LOADERS['/path'])
+const LearningCenterPage = lazy(ROUTE_LOADERS['/learn'])
+const LogicPage = lazy(ROUTE_LOADERS['/logic'])
+const AlgorithmComparePage = lazy(ROUTE_LOADERS['/compare'])
+const GitHubGuidePage = lazy(ROUTE_LOADERS['/github'])
+const AIGuidePage = lazy(ROUTE_LOADERS['/ai'])
+const FinancePage = lazy(ROUTE_LOADERS['/finance'])
+const StockMarketPage = lazy(ROUTE_LOADERS['/finance/stocks'])
+const InterviewGuidePage = lazy(ROUTE_LOADERS['/interview'])
+const RoadmapPage = lazy(ROUTE_LOADERS['/roadmap'])
+const ToolboxPage = lazy(ROUTE_LOADERS['/toolbox'])
+const ProjectsGuidePage = lazy(ROUTE_LOADERS['/projects'])
+const SetupGuidePage = lazy(ROUTE_LOADERS['/setup'])
+const PersonalGrowthPage = lazy(ROUTE_LOADERS['/growth'])
+const HealthPage = lazy(ROUTE_LOADERS['/health'])
+const BookNotesPage = lazy(ROUTE_LOADERS['/books'])
+const PianoPage = lazy(ROUTE_LOADERS['/piano'])
+const PianoLessonPage = lazy(ROUTE_LOADERS['/piano/lesson'])
+const PianoPracticePage = lazy(ROUTE_LOADERS['/piano/practice'])
+const PianoPlaygroundPage = lazy(ROUTE_LOADERS['/piano/legacy'])
+const GuitarPage = lazy(ROUTE_LOADERS['/guitar'])
+const GuitarLessonPage = lazy(ROUTE_LOADERS['/guitar/lesson'])
+const ViolinPage = lazy(ROUTE_LOADERS['/violin'])
+const ViolinLessonPage = lazy(ROUTE_LOADERS['/violin/lesson'])
+const AIPage = lazy(ROUTE_LOADERS['/ai-course'])
+const AILessonPage = lazy(ROUTE_LOADERS['/ai-course/lesson'])
+const NotFoundPage = lazy(NOT_FOUND_LOADER)
 
-function PageFallback() {
-  return (
-    <div style={{
-      minHeight: '55vh',
-      display: 'grid',
-      placeItems: 'center',
-      color: 'var(--text-tertiary)',
-      fontWeight: 700,
-    }}>
-      Loading...
-    </div>
-  )
+// 路由 → document.title(最长前缀匹配)。浏览器历史/书签/搜索结果
+// 不再是清一色 "algo-viz"(审计 #11)。算法/课节等详情页用栏目名兜底,
+// 更细粒度的标题可由页面自身覆盖。
+const BASE_TITLE = 'CS Hub · 算法可视化学习平台'
+const ROUTE_TITLES = {
+  '/algo': '算法库',
+  '/compare': '算法对比',
+  '/learn': '资源导航',
+  '/logic': '逻辑学',
+  '/finance': '理财',
+  '/growth': '个人成长',
+  '/ai-course': 'AI 专业课',
+  '/path': '学习路径',
+  '/profile': '个人主页',
+  '/piano': '钢琴',
+  '/guitar': '吉他',
+  '/violin': '小提琴',
+  '/roadmap': '学习路线图',
+  '/interview': '面试与求职',
+  '/toolbox': '开发者工具箱',
+}
+const TITLE_KEYS = Object.keys(ROUTE_TITLES).sort((a, b) => b.length - a.length)
+
+function DocumentTitle() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const key = TITLE_KEYS.find(k => pathname === k || pathname.startsWith(k + '/'))
+    document.title = key ? `${ROUTE_TITLES[key]} · CS Hub` : BASE_TITLE
+  }, [pathname])
+  return null
 }
 
 function AppRoutes() {
@@ -54,7 +76,7 @@ function AppRoutes() {
   const location = useLocation()
   return (
     <ErrorBoundary resetKey={location.pathname}>
-      <Suspense fallback={<PageFallback />}>
+      <Suspense fallback={<PageSkeleton />}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomePage />} />
@@ -102,6 +124,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Analytics />
+      <DocumentTitle />
       <AppRoutes />
     </BrowserRouter>
   )
