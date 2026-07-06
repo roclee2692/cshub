@@ -36,7 +36,7 @@ function AIExercise({ exercise, lesson, onSnapshotChange }) {
 // 课节正文:use() 挂起等待章节 chunk;loadLesson 按 id 缓存 Promise,
 // 重渲染拿到同一实例不会无限 suspend。快照状态属于具体课节,一并放在这里,
 // lessonId 变化时组件因 key 重建,状态自然复位。
-function LessonBody({ canonicalLessonId, lessonId, isCompleted, markComplete }) {
+function LessonBody({ canonicalLessonId, isCompleted, markComplete }) {
   const lesson = use(loadLesson(canonicalLessonId))
   const [playgroundSnapshot, setPlaygroundSnapshot] = useState(null)
   const snapshotKeyRef = useRef('')
@@ -163,7 +163,6 @@ export default function AILessonPage() {
           <LessonBody
             key={canonicalLessonId}
             canonicalLessonId={canonicalLessonId}
-            lessonId={lessonId}
             isCompleted={isCompleted}
             markComplete={markComplete}
           />
